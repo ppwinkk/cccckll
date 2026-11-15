@@ -754,7 +754,23 @@
     @media(max-width:900px){.brand-logo-image{width:175px;height:auto}}
     @media(max-width:650px){.brand-logo-image{width:150px;height:auto}}
 
-  </style>
+  
+/* PINORA 2.0 AUTH — isolated styles */
+#pinora-auth{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(circle at 10% 10%,#e8dfff,transparent 40%),linear-gradient(125deg,#faf7ff,#fff0f7)}
+#pinora-auth[hidden]{display:none!important}
+.pinora-auth-card{width:min(430px,100%);background:#fff;border:1px solid #eee5ff;border-radius:26px;padding:34px;box-shadow:0 24px 70px #6c5ce71c}
+.pinora-auth-logo{font-size:32px;font-weight:800;color:#6c5ce7;text-align:center}.pinora-auth-sub{text-align:center;color:#8f87a8;font-size:13px;margin:5px 0 22px}
+.pinora-auth-tabs{display:flex;background:#f5f1ff;padding:5px;border-radius:14px;gap:5px;margin-bottom:18px}
+.pinora-auth-tabs button{flex:1;border:0;background:transparent;border-radius:10px;padding:10px;color:#7b6e9f;font-weight:600}
+.pinora-auth-tabs button.active{background:#fff;color:#6c5ce7;box-shadow:0 2px 10px #6c5ce71a}
+.pinora-auth-card label{display:block;font-size:12px;color:#51476f;font-weight:600;margin:12px 0 5px}
+.pinora-auth-card input{width:100%;padding:12px 13px;border:1px solid #e8e2f4;border-radius:12px;outline:none}
+.pinora-auth-card input:focus{border-color:#9e8bf0;box-shadow:0 0 0 3px #b39dff33}
+.pinora-auth-submit{width:100%;margin-top:20px;border:0;border-radius:13px;padding:13px;background:#6c5ce7;color:white;font-weight:700}
+#pinora-auth-message{font-size:12px;line-height:1.6;margin-top:13px;min-height:20px;color:#7358c9}
+.pinora-signout{border:1px solid #e8e2f4;border-radius:10px;padding:7px 10px;background:white;color:#6c5ce7;font-size:11px}
+@media(max-width:500px){.pinora-auth-card{padding:23px}.pinora-signout{font-size:10px}}
+</style>
 </head>
 <body>
 <div class="app-shell">
@@ -799,7 +815,7 @@
       <div class="breadcrumbs"><span>Workspace</span><b>›</b><strong id="breadcrumb-current">หน้าหลัก</strong></div>
       <div class="workspace-header-actions">
         <span class="online-status"><i></i> บันทึกออนไลน์</span>
-        <button class="user-pill" type="button"><span class="user-pill-avatar">ม</span> ผู้ใช้งาน Pinora</button>
+        <button class="user-pill" type="button"><span class="user-pill-avatar">ม</span> <span id="pinora-user-name">ผู้ใช้งาน Pinora</span></button><button class="pinora-signout" type="button" onclick="pinoraSignOut()">ออกจากระบบ</button>
       </div>
     </header>
 
@@ -933,16 +949,58 @@
 </div>
 <div class="toast" id="toast"></div>
 
+
+<div id="pinora-auth" aria-label="เข้าสู่ระบบ Pinora">
+  <div class="pinora-auth-card">
+    <div class="pinora-auth-logo">✳ Pinora</div>
+    <p class="pinora-auth-sub">พื้นที่แบ่งปันไอเดียของทุกคน</p>
+    <div class="pinora-auth-tabs">
+      <button id="pinora-login-tab" type="button" class="active" onclick="pinoraSwitchAuth('login')">เข้าสู่ระบบ</button>
+      <button id="pinora-register-tab" type="button" onclick="pinoraSwitchAuth('register')">สมัครสมาชิก</button>
+    </div>
+    <form id="pinora-auth-form">
+      <div id="pinora-name-field" hidden><label for="pinora-full-name">ชื่อที่แสดง</label><input id="pinora-full-name" type="text" maxlength="80" autocomplete="name" placeholder="ชื่อของคุณ"></div>
+      <label for="pinora-email">อีเมล</label><input id="pinora-email" type="email" autocomplete="email" required placeholder="you@example.com">
+      <label for="pinora-password">รหัสผ่าน</label><input id="pinora-password" type="password" minlength="6" autocomplete="current-password" required placeholder="อย่างน้อย 6 ตัวอักษร">
+      <button class="pinora-auth-submit" id="pinora-auth-submit" type="submit">เข้าสู่ระบบ</button>
+      <div id="pinora-auth-message" role="status" aria-live="polite"></div>
+    </form>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (() => {
   // Supabase connection (Publishable Key is intended for browser-side use).
-  const SUPABASE_URL = "https://wreufcjtwewliovjknxr.supabase.co";
-  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_GIL28vIXt22mSrD3alMEoA_n32149Jf";
-  const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  const SUPABASE_URL = "https://cemcgzfegdyrhtudvzcq.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_gfVco61PRM0wachg49AHlw_smHgEC4k";
+  const supabaseClient = (window.supabase && SUPABASE_URL.startsWith("https://")) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
 
-  const STORE_KEY = "pinora_v1_data";
-  const LIKED_KEY = "pinora_v1_liked_posts";
+
+
+
+// ✅ เพิ่มฟังก์ชันนี้ตรงนี้
+async function changeIdeaStatus(postId, newStatus, note = "") {
+  const { error } = await supabaseClient.rpc(
+    "change_idea_status",
+    {
+      p_post_id: postId,
+      p_new_status: newStatus,
+      p_note: note
+    }
+  );
+
+  if (error) {
+    console.error("เปลี่ยนสถานะไม่สำเร็จ:", error.message);
+    return false;
+  }
+
+  console.log("เปลี่ยนสถานะสำเร็จ");
+  return true;
+}
+
+
+
   const VISITOR_KEY = "pinora_v1_visitor_id";
   const icons = ["💡","🧪","🎨","🚀","📚","🧩","🌱","🎯"];
   let filter = "ทั้งหมด";
@@ -1192,16 +1250,30 @@
 
   document.getElementById("board-form").addEventListener("submit",async e=>{
     e.preventDefault();
-    const title=document.getElementById("board-title").value.trim();if(!title)return;
-    const board={id:uid(),title,description:document.getElementById("board-desc").value.trim(),category:document.getElementById("board-category").value,color:document.getElementById("board-color").value,icon:icons[Math.floor(Math.random()*icons.length)],created:Date.now()};
-    if(cloudReady){
-      const {error}=await supabaseClient.from("boards").insert({id:board.id,title:board.title,description:board.description,category:board.category,color:board.color,icon:board.icon});
-      if(error){console.error(error);toast("สร้างกระดานไม่สำเร็จ");return;}
-      await loadCloudData(false);
-    }else{
-      data.boards.unshift(board);saveLocal();
+    const title=document.getElementById("board-title").value.trim();
+    if(!title)return;
+    if(!cloudReady){
+      toast("ยังไม่เชื่อมต่อ Supabase จึงยังสร้างกระดานไม่ได้");
+      console.error("Pinora: Cloud not ready. Board was NOT saved locally.");
+      return;
     }
-    e.target.reset();closeModal("board-modal");filter="ทั้งหมด";renderHome();toast("สร้างกระดานเรียบร้อยแล้ว");
+    const {data:authData,error:authError}=await supabaseClient.auth.getUser();
+    const user=authData?.user;
+    if(authError||!user){toast("กรุณาเข้าสู่ระบบอีกครั้ง");return;}
+    const board={
+      title,
+      description:document.getElementById("board-desc").value.trim(),
+      category:document.getElementById("board-category").value,
+      color:document.getElementById("board-color").value,
+      icon:icons[Math.floor(Math.random()*icons.length)],
+      owner_id:user.id
+    };
+    const {data:created,error}=await supabaseClient.from("boards").insert(board).select("id").single();
+    if(error){console.error("Pinora board insert error:",error);toast("สร้างกระดานไม่สำเร็จ: "+error.message);return;}
+    try{await loadCloudData(false);}
+    catch(loadError){console.error("Board saved, but refresh failed:",loadError);toast("บันทึกลง Supabase แล้ว แต่โหลดรายการใหม่ไม่สำเร็จ");return;}
+    e.target.reset();closeModal("board-modal");filter="ทั้งหมด";renderHome();
+    toast("สร้างกระดานใน Supabase เรียบร้อยแล้ว");
   });
 
   document.getElementById("post-form").addEventListener("submit",async e=>{
@@ -1324,7 +1396,7 @@
   async function initCloud(){
     if(!supabaseClient){toast("โหลด Supabase ไม่สำเร็จ กำลังใช้ข้อมูลในเครื่อง");renderHome();return;}
     try{
-      await loadCloudData(true);
+      await loadCloudData(false);
       cloudReady=true;
       subscribeRealtime();
       renderHome();
@@ -1333,6 +1405,7 @@
     }catch(error){
       cloudReady=false;
       console.error("Supabase connection/setup error:",error);
+      data={boards:[],posts:[]};
       renderHome();
       toast("ฐานข้อมูลยังไม่พร้อม กรุณารันไฟล์ SQL ที่แนบมาก่อน");
     }
@@ -1347,9 +1420,69 @@
     if(!activeBoardId)showHome();
   }
   window.addEventListener("hashchange",handleHash);
-  renderHome();
-  handleHash();
-  initCloud();
+  // Authentication gate: initialize data only after a valid session.
+  async function startPinoraAuth(){
+    const overlay=document.getElementById('pinora-auth');
+    if(!supabaseClient){document.getElementById('pinora-auth-message').textContent='กรุณาใส่ Project URL และ Publishable Key ของโปรเจกต์ใหม่ในไฟล์ HTML ก่อน';return;}
+    const {data:{session},error}=await supabaseClient.auth.getSession();
+    if(error)console.error('Session error',error);
+    if(session){await showSignedIn(session.user);}else{overlay.hidden=false;}
+    supabaseClient.auth.onAuthStateChange((event,session)=>{
+      if(event==='SIGNED_OUT'){overlay.hidden=false;document.getElementById('pinora-user-name').textContent='ผู้ใช้งาน Pinora';}
+      if(event==='SIGNED_IN'&&session){setTimeout(()=>showSignedIn(session.user),0);}
+    });
+  }
+  let loadedForUser=null;
+  async function showSignedIn(user){
+    document.getElementById('pinora-auth').hidden=true;
+    let name=user.user_metadata?.full_name || user.email?.split('@')[0] || 'สมาชิก';
+    try{
+      const {data:profile}=await supabaseClient.from('profiles').select('full_name').eq('id',user.id).maybeSingle();
+      if(profile?.full_name)name=profile.full_name;
+    }catch(e){console.warn('Profile fetch:',e);}
+    document.getElementById('pinora-user-name').textContent=name;
+    const sidebar=document.querySelector('.sidebar-profile strong');if(sidebar)sidebar.textContent=name;
+    if(loadedForUser!==user.id){loadedForUser=user.id;renderHome();handleHash();await initCloud();}
+  }
+  window.pinoraSwitchAuth=mode=>{
+    const register=mode==='register';
+    document.getElementById('pinora-name-field').hidden=!register;
+    document.getElementById('pinora-full-name').required=register;
+    document.getElementById('pinora-password').autocomplete=register?'new-password':'current-password';
+    document.getElementById('pinora-auth-submit').textContent=register?'สมัครสมาชิก':'เข้าสู่ระบบ';
+    document.getElementById('pinora-login-tab').classList.toggle('active',!register);
+    document.getElementById('pinora-register-tab').classList.toggle('active',register);
+    document.getElementById('pinora-auth-message').textContent='';
+    document.getElementById('pinora-auth-form').dataset.mode=mode;
+  };
+  document.getElementById('pinora-auth-form').addEventListener('submit',async event=>{
+    event.preventDefault();
+    const form=event.currentTarget,button=document.getElementById('pinora-auth-submit');
+    const message=document.getElementById('pinora-auth-message');
+    const email=document.getElementById('pinora-email').value.trim();
+    const password=document.getElementById('pinora-password').value;
+    const register=form.dataset.mode==='register';
+    if(!supabaseClient){message.textContent='ยังไม่ได้ตั้งค่า Supabase ใหม่';return;}
+    button.disabled=true;message.textContent='กำลังดำเนินการ...';
+    try{
+      const result=register
+        ? await supabaseClient.auth.signUp({email,password,options:{data:{full_name:document.getElementById('pinora-full-name').value.trim()}}})
+        : await supabaseClient.auth.signInWithPassword({email,password});
+      if(result.error)throw result.error;
+      if(register&&!result.data.session){message.textContent='สมัครสมาชิกแล้ว กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี ก่อนเข้าสู่ระบบ';}
+      else if(result.data.user){await showSignedIn(result.data.user);}
+    }catch(error){message.textContent=error.message||'เกิดข้อผิดพลาด กรุณาลองใหม่';}
+    finally{button.disabled=false;}
+  });
+  window.pinoraSignOut=async()=>{
+    if(!supabaseClient)return;
+    const {error}=await supabaseClient.auth.signOut();
+    if(error){toast('ออกจากระบบไม่สำเร็จ: '+error.message);return;}
+    loadedForUser=null;
+    document.getElementById('pinora-auth').hidden=false;
+    pinoraSwitchAuth('login');
+  };
+  startPinoraAuth();
 })();
 </script>
 </body>
