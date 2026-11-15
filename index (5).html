@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#6C5CE7" />
+  <title>Pinora — กระดานแชร์ไอเดียออนไลน์</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700;800&display=swap');
+    :root{
+      --purple:#6C5CE7; --lavender:#B39DFF; --pink:#FF9EC7;
+      --yellow:#FFE59A; --blue:#AEE4FF; --ink:#21164f;
+      --muted:#716b8e; --paper:#fff; --line:#e9e3fb;
+      --bg:#f8f6ff; --shadow:0 12px 32px rgba(83,62,157,.10);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Tahoma,"Noto Sans Thai",system-ui,sans-serif;color:var(--ink);
+      background:radial-gradient(circle at 8% 2%,#eee8ff 0,transparent 27%),linear-gradient(135deg,#fbfaff,#f5f1ff 55%,#fff8fc)}
+    button,input,textarea,select{font:inherit}
+    button{cursor:pointer}
+    .app{min-height:100vh}
+    .topbar{height:76px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,4vw,58px);
+      background:rgba(255,255,255,.78);backdrop-filter:blur(14px);border-bottom:1px solid rgba(179,157,255,.24);position:sticky;top:0;z-index:20}
+    .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+    .brand-mark{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--lavender),var(--purple));display:grid;place-items:center;box-shadow:0 7px 16px #6c5ce733}
+    .brand-mark svg{width:25px;height:25px}
+    .brand-name{font-weight:900;font-size:26px;letter-spacing:-.7px}
+    .brand-tag{font-size:11px;color:var(--muted);margin-top:1px}
+    .top-actions{display:flex;align-items:center;gap:10px}
+    .avatar-stack{display:flex;align-items:center}
+    .avatar{width:30px;height:30px;border:2px solid white;border-radius:50%;display:grid;place-items:center;font-size:12px;background:#ffe5f0;margin-left:-7px}
+    .avatar:first-child{margin-left:0}
+    .btn{border:0;border-radius:13px;padding:11px 16px;font-weight:700;transition:.18s;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+    .btn:hover{transform:translateY(-1px);filter:brightness(1.02)}
+    .btn-primary{background:var(--purple);color:#fff;box-shadow:0 7px 16px #6c5ce733}
+    .btn-soft{background:#f0ebff;color:var(--purple)}
+    .btn-white{background:white;color:var(--ink);border:1px solid var(--line)}
+    .btn-icon{width:40px;height:40px;padding:0;background:white;color:var(--ink);border:1px solid var(--line);border-radius:13px}
+    .layout{display:grid;grid-template-columns:240px minmax(0,1fr);gap:28px;max-width:1440px;margin:0 auto;padding:28px clamp(16px,3vw,42px) 50px}
+    .sidebar{align-self:start;position:sticky;top:98px}
+    .side-card,.panel,.board-card,.post-card{background:rgba(255,255,255,.88);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .side-card{padding:18px;margin-bottom:16px}
+    .side-title{font-size:12px;color:#9389b4;font-weight:800;letter-spacing:.7px;margin:3px 8px 12px}
+    .nav-item{display:flex;align-items:center;gap:12px;padding:12px 13px;border-radius:13px;color:#554d78;font-weight:700;font-size:14px;margin:3px 0;cursor:pointer}
+    .nav-item.active,.nav-item:hover{background:#f0ebff;color:var(--purple)}
+    .nav-icon{width:24px;text-align:center;font-size:17px}
+    .side-note{background:linear-gradient(135deg,#fff5cf,#fff);border-radius:16px;padding:14px;font-size:12px;line-height:1.7;color:#685a31}
+    .side-note strong{display:block;color:#4d3c0c;font-size:13px;margin-bottom:3px}
+    main{min-width:0}
+    .welcome{display:flex;justify-content:space-between;align-items:center;gap:20px;margin:5px 0 24px}
+    .eyebrow{display:inline-flex;align-items:center;gap:7px;color:var(--purple);font-weight:800;font-size:12px;background:#eee9ff;padding:7px 11px;border-radius:99px}
+    h1{font-size:clamp(26px,3vw,36px);line-height:1.2;margin:12px 0 7px;letter-spacing:-.7px}
+    .welcome p{margin:0;color:var(--muted);font-size:14px}
+    .welcome-art{width:150px;height:112px;border-radius:26px;background:linear-gradient(135deg,#eee7ff,#ffe7f1);display:grid;place-items:center;font-size:55px;flex-shrink:0}
+    .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
+    .search{position:relative;flex:1;min-width:200px}
+    .search input{width:100%;border:1px solid var(--line);border-radius:14px;background:#fff;padding:12px 14px 12px 42px;outline:none;color:var(--ink)}
+    .search input:focus,.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--lavender);box-shadow:0 0 0 3px #b39dff30}
+    .search span{position:absolute;left:14px;top:10px;color:#9389b4;font-size:18px}
+    .section-head{display:flex;justify-content:space-between;align-items:center;margin:25px 0 14px}
+    .section-head h2{font-size:18px;margin:0}
+    .section-head small{color:#9188aa}
+    .board-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+    .board-card{overflow:hidden;cursor:pointer;transition:.2s}
+    .board-card:hover{transform:translateY(-3px);box-shadow:0 16px 36px rgba(83,62,157,.16)}
+    .board-cover{height:112px;padding:16px;display:flex;justify-content:space-between;align-items:flex-start}
+    .board-emoji{font-size:34px;filter:drop-shadow(0 4px 3px #00000012)}
+    .board-tag{font-size:10px;font-weight:800;color:#574c78;background:#ffffffb8;border-radius:99px;padding:6px 9px}
+    .board-info{padding:14px 15px 15px}
+    .board-info h3{font-size:15px;margin:0 0 6px}
+    .board-info p{font-size:12px;color:var(--muted);margin:0 0 13px;min-height:18px}
+    .board-meta{display:flex;align-items:center;justify-content:space-between;color:#82799f;font-size:11px}
+    .mini-avatars{display:flex}.mini-avatars span{width:23px;height:23px;border-radius:50%;display:grid;place-items:center;border:2px solid white;background:#eee8ff;margin-left:-5px;font-size:10px}
+    .mini-avatars span:first-child{margin-left:0}
+    .create-card{border:1.5px dashed #c9bafa;background:#fbfaff;display:grid;place-items:center;min-height:230px;color:var(--purple);font-weight:800;gap:8px}
+    .create-card .plus{width:48px;height:48px;border-radius:16px;background:#eee9ff;display:grid;place-items:center;font-size:27px}
+    .activity-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .post-card{padding:16px}
+    .post-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+    .person{width:36px;height:36px;border-radius:13px;background:#fce4f0;display:grid;place-items:center;font-size:17px}
+    .person-meta{flex:1;min-width:0}
+    .person-meta strong{display:block;font-size:12px}
+    .person-meta small{color:#958cad;font-size:10px}
+    .post-type{font-size:10px;padding:5px 8px;border-radius:99px;background:#f0ebff;color:var(--purple);font-weight:800}
+    .post-card h3{font-size:15px;margin:0 0 7px}
+    .post-card p{font-size:13px;color:#625a7e;line-height:1.65;margin:0 0 12px;white-space:pre-wrap}
+    .post-image{width:100%;max-height:190px;object-fit:cover;border-radius:14px;margin:2px 0 12px;background:#f6f2ff}
+    .post-actions{display:flex;align-items:center;gap:14px;border-top:1px solid #f0ecf8;padding-top:11px}
+    .text-action{border:0;background:none;padding:3px 0;color:#7c7397;font-size:12px;display:inline-flex;align-items:center;gap:5px}
+    .text-action.liked{color:#df5a99;font-weight:800}
+    .detail-view{display:none}
+    .detail-top{display:flex;align-items:center;gap:12px;margin:4px 0 18px}
+    .detail-cover{padding:22px;border-radius:22px;margin-bottom:18px}
+    .detail-cover h2{margin:8px 0 4px;font-size:24px}
+    .detail-cover p{margin:0;color:#5c537b;font-size:13px}
+    .post-list{display:grid;gap:14px}
+    .empty{padding:35px 20px;text-align:center;color:#8c83a7;background:#fff;border:1px dashed #d9d0f1;border-radius:18px}
+    .empty .empty-icon{font-size:36px;margin-bottom:8px}
+    .modal-backdrop{position:fixed;inset:0;background:#1e164c66;backdrop-filter:blur(5px);z-index:50;display:none;align-items:center;justify-content:center;padding:16px}
+    .modal-backdrop.show{display:flex}
+    .modal{width:min(540px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:24px;padding:23px;box-shadow:0 24px 70px #21164f40}
+    .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+    .modal-head h2{font-size:20px;margin:0}
+    .close{border:0;background:#f3efff;color:#6e6391;border-radius:11px;width:34px;height:34px;font-size:20px}
+    .field{margin:13px 0}
+    .field label{display:block;font-size:12px;font-weight:800;margin-bottom:7px;color:#5f567e}
+    .field input,.field textarea,.field select{width:100%;border:1px solid var(--line);border-radius:13px;padding:12px 13px;outline:none;background:#fff;color:var(--ink)}
+    .field textarea{min-height:110px;resize:vertical}
+    .field small{display:block;color:#9a91ad;font-size:10px;margin-top:5px}
+    .form-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}
+    .toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#251957;color:#fff;padding:11px 17px;border-radius:13px;font-size:13px;z-index:80;transition:.25s;box-shadow:var(--shadow)}
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    .comment-box{margin-top:12px;padding-top:12px;border-top:1px solid #f0ecf8}
+    .comment{font-size:12px;color:#655c80;padding:7px 0}
+    .comment strong{color:#34285f;margin-right:5px}
+    .comment-form{display:flex;gap:7px;margin-top:8px}
+    .comment-form input{flex:1;min-width:0;border:1px solid var(--line);border-radius:11px;padding:9px 11px;outline:none;font-size:12px}
+    .comment-form button{border:0;border-radius:11px;padding:0 12px;background:#eee9ff;color:var(--purple);font-weight:800}
+    .api-note{font-size:11px;color:#82799d;background:#f5f1ff;border-radius:12px;padding:10px 12px;margin-top:18px;line-height:1.6}
+    footer{text-align:center;padding:0 15px 28px;color:#a29ab7;font-size:11px}
+    @media(max-width:1050px){.board-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.layout{grid-template-columns:210px minmax(0,1fr);gap:18px}}
+    @media(max-width:760px){
+      .topbar{height:66px;padding:0 15px}.brand-name{font-size:22px}.brand-tag,.avatar-stack{display:none}
+      .layout{display:block;padding:20px 14px 35px}.sidebar{position:static;display:flex;gap:7px;overflow:auto;margin-bottom:18px}
+      .side-card{padding:6px;display:flex;gap:4px;white-space:nowrap;margin:0;border-radius:15px}
+      .side-title,.side-note{display:none}.nav-item{padding:9px 11px;margin:0;font-size:12px}.nav-icon{width:auto}
+      .welcome-art{width:85px;height:78px;font-size:38px}.welcome{margin-top:0}
+      .board-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.board-cover{height:90px}.board-info{padding:11px}.board-info h3{font-size:13px}
+      .activity-grid{grid-template-columns:1fr}.toolbar .btn{padding:10px 12px;font-size:12px}
+    }
+    @media(max-width:430px){.board-grid{grid-template-columns:1fr 1fr}.welcome-art{display:none}.welcome p{font-size:12px}.section-head h2{font-size:16px}.top-actions .btn-primary{padding:9px 11px;font-size:12px}}
+  
+
+    /* =========================================================
+       PINORA VISUAL REFINEMENT
+       Preserve the approved layout, palette and all app behavior.
+       This layer only improves spacing, depth, hierarchy and polish.
+    ========================================================= */
+    :root{
+      --purple:#6C5CE7;
+      --lavender:#B39DFF;
+      --pink:#FF9EC7;
+      --yellow:#FFE59A;
+      --blue:#AEE4FF;
+      --mint:#D2F2D2;
+      --ink:#241956;
+      --muted:#77708F;
+      --line:#EAE5F7;
+      --bg:#FAF9FF;
+      --shadow:0 14px 34px rgba(74,53,145,.085);
+      --radius:24px;
+    }
+    html{scroll-behavior:smooth}
+    body{
+      color:var(--ink);
+      background:
+        radial-gradient(ellipse at 7% 4%,rgba(179,157,255,.22),transparent 28%),
+        radial-gradient(ellipse at 96% 15%,rgba(255,158,199,.16),transparent 25%),
+        linear-gradient(145deg,#FBFAFF 0%,#F7F4FF 52%,#FFFAFC 100%);
+      font-family:"Noto Sans Thai","Leelawadee UI",Tahoma,system-ui,sans-serif;
+      letter-spacing:-.12px;
+    }
+    button,input,textarea,select{font-family:inherit}
+    button:focus-visible,.nav-item:focus-visible,.board-card:focus-visible{
+      outline:3px solid rgba(108,92,231,.28);outline-offset:3px
+    }
+    .topbar{
+      height:82px;padding:0 clamp(18px,4vw,64px);
+      background:rgba(255,255,255,.9);
+      border-bottom:1px solid rgba(179,157,255,.22);
+      box-shadow:0 5px 22px rgba(48,31,106,.035);
+      backdrop-filter:blur(18px);
+    }
+    .brand{gap:13px}
+    .brand-mark{
+      width:48px;height:48px;border-radius:16px;
+      background:linear-gradient(145deg,#BDAEFF 0%,#6C5CE7 100%);
+      box-shadow:0 9px 20px rgba(108,92,231,.22);
+      border:1px solid rgba(255,255,255,.7)
+    }
+    .brand-mark svg{width:30px;height:30px}
+    .brand-name{font-size:29px;letter-spacing:-1px;color:#21164F}
+    .brand-tag{font-size:11px;color:#81799D;letter-spacing:.05px}
+    .top-actions{gap:14px}
+    .avatar{width:33px;height:33px;box-shadow:0 2px 7px rgba(48,31,106,.08)}
+    .btn{
+      border-radius:14px;padding:11px 17px;font-size:13px;font-weight:750;
+      transition:transform .18s ease,box-shadow .18s ease,background .18s ease;
+    }
+    .btn:hover{transform:translateY(-2px)}
+    .btn-primary{
+      background:linear-gradient(135deg,#7969EB,#5D4BD0);
+      box-shadow:0 8px 18px rgba(108,92,231,.22)
+    }
+    .btn-primary:hover{box-shadow:0 11px 24px rgba(108,92,231,.28)}
+    .btn-soft{background:#F0ECFF;color:#6553D6;border:1px solid #E7E0FF}
+    .btn-white{background:rgba(255,255,255,.94);border:1px solid #E9E4F5;color:#4C426F}
+    .btn-icon{border-radius:14px}
+    .layout{
+      grid-template-columns:250px minmax(0,1fr);gap:30px;
+      max-width:1500px;padding:34px clamp(18px,3.3vw,48px) 54px
+    }
+    .sidebar{top:104px}
+    .side-card,.panel,.board-card,.post-card{
+      background:rgba(255,255,255,.94);border:1px solid rgba(226,219,246,.9);
+      border-radius:23px;box-shadow:0 9px 26px rgba(63,45,126,.055)
+    }
+    .side-card{padding:17px;margin-bottom:15px}
+    .side-title{font-size:11px;color:#958CB2;letter-spacing:1px;margin:4px 9px 13px}
+    .nav-item{
+      padding:12px 13px;border-radius:14px;color:#5D557C;
+      font-size:13px;font-weight:700;margin:4px 0;transition:.18s ease
+    }
+    .nav-item.active,.nav-item:hover{
+      color:#604FD2;background:linear-gradient(100deg,#F0ECFF,#F8F6FF);
+      box-shadow:inset 3px 0 0 #8C7AF0
+    }
+    .nav-icon{width:25px;font-size:18px;color:#7969D9}
+    .side-note{
+      background:linear-gradient(135deg,#FFF7D9 0%,#FFFCF1 100%);
+      border:1px solid #F7EBC2;border-radius:17px;padding:15px;
+      color:#74643A;font-size:12px;line-height:1.8
+    }
+    .side-note strong{color:#4E3D0E;font-size:13px}
+    .welcome{
+      position:relative;isolation:isolate;overflow:hidden;
+      min-height:210px;padding:29px 32px;margin:0 0 24px;
+      border:1px solid rgba(224,216,249,.95);border-radius:29px;
+      background:linear-gradient(112deg,#F0EBFF 0%,#F8F1FF 42%,#FFF0F6 74%,#FFF8E8 100%);
+      box-shadow:0 13px 34px rgba(86,65,158,.085)
+    }
+    .welcome::before{
+      content:"";position:absolute;z-index:-1;width:250px;height:250px;
+      right:105px;top:-155px;border-radius:50%;
+      background:rgba(255,255,255,.52)
+    }
+    .welcome::after{
+      content:"";position:absolute;z-index:-1;width:190px;height:190px;
+      right:-58px;bottom:-125px;border-radius:50%;
+      background:rgba(255,255,255,.43);border:1px solid rgba(255,255,255,.55)
+    }
+    .welcome>div:first-child{position:relative;z-index:1}
+    .eyebrow{
+      color:#6957D8;background:rgba(255,255,255,.76);
+      border:1px solid rgba(255,255,255,.9);padding:7px 12px;
+      font-size:11px;letter-spacing:.65px;box-shadow:0 3px 10px rgba(89,67,159,.04)
+    }
+    h1{font-size:clamp(29px,3.1vw,39px);line-height:1.28;margin:13px 0 8px;letter-spacing:-.8px;color:#241956}
+    .welcome p{font-size:13px;line-height:1.75;color:#756C92}
+    .welcome-art{
+      position:relative;isolation:isolate;width:172px;height:142px;
+      border:1px solid rgba(255,255,255,.9);border-radius:28px;
+      background:linear-gradient(145deg,rgba(255,255,255,.92),rgba(239,232,255,.92));
+      box-shadow:0 12px 27px rgba(96,75,170,.12),inset 0 1px 0 white;
+      font-size:53px;transform:rotate(2deg)
+    }
+    .welcome-art::before{
+      content:"";position:absolute;z-index:-1;width:76px;height:76px;
+      left:24px;top:28px;border-radius:23px;background:rgba(255,229,154,.72);
+      transform:rotate(-13deg)
+    }
+    .welcome-art::after{
+      content:"✦";position:absolute;right:17px;top:12px;color:#F2B93E;
+      font-size:23px;text-shadow:0 3px 8px rgba(242,185,62,.18)
+    }
+    .toolbar{gap:9px;margin-bottom:23px}
+    .search{min-width:230px}
+    .search input{
+      min-height:46px;border:1px solid #E8E2F6;border-radius:15px;
+      padding:12px 15px 12px 43px;background:rgba(255,255,255,.96);
+      box-shadow:0 4px 13px rgba(64,44,130,.035);font-size:13px
+    }
+    .search span{left:15px;top:10px;color:#9B91BC}
+    .toolbar>.btn{min-height:43px;padding:10px 16px;border-radius:999px;font-size:12px}
+    .section-head{margin:27px 0 15px;gap:12px}
+    .section-head h2{font-size:19px;font-weight:850;letter-spacing:-.25px;color:#2B205D}
+    .section-head small{font-size:11px;color:#9A92B1}
+    .board-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:17px}
+    .board-card{
+      overflow:hidden;border-radius:22px;cursor:pointer;
+      transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease
+    }
+    .board-card:hover{transform:translateY(-4px);border-color:#D9D0F5;box-shadow:0 17px 34px rgba(78,57,148,.13)}
+    .board-cover{
+      position:relative;isolation:isolate;overflow:hidden;height:126px;padding:17px;
+      background-image:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.34))
+    }
+    .board-cover::before{
+      content:"";position:absolute;z-index:-1;width:145px;height:145px;
+      right:-28px;top:-72px;border-radius:50%;background:rgba(255,255,255,.28)
+    }
+    .board-cover::after{
+      content:"";position:absolute;z-index:-1;width:72px;height:72px;
+      right:64px;bottom:-43px;border-radius:23px;transform:rotate(28deg);
+      background:rgba(255,255,255,.2)
+    }
+    .board-emoji{
+      display:grid;place-items:center;width:61px;height:61px;border-radius:20px;
+      background:rgba(255,255,255,.58);border:1px solid rgba(255,255,255,.68);
+      box-shadow:0 7px 17px rgba(65,48,118,.07);font-size:32px;
+      position:relative;z-index:1;backdrop-filter:blur(5px)
+    }
+    .board-tag{
+      position:relative;z-index:1;background:rgba(255,255,255,.76);
+      border:1px solid rgba(255,255,255,.6);color:#51466F;
+      font-size:10px;padding:6px 10px;box-shadow:0 2px 7px rgba(61,45,112,.035)
+    }
+    .board-info{padding:15px 16px 16px;background:#fff}
+    .board-info h3{
+      font-size:14px;line-height:1.5;min-height:42px;margin:0 0 5px;
+      color:#2C225C;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden
+    }
+    .board-info p{
+      font-size:11px;line-height:1.65;color:#8981A1;margin:0 0 14px;
+      min-height:36px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden
+    }
+    .board-meta{padding-top:10px;border-top:1px solid #F2EFF8;color:#8C84A5;font-size:10px}
+    .mini-avatars span{width:24px;height:24px;background:#F0ECFF;border-color:#fff;box-shadow:0 2px 4px rgba(70,53,132,.05)}
+    .create-card{
+      min-height:226px;border:1.5px dashed #C8BDF1;
+      background:linear-gradient(145deg,#FCFBFF,#F6F2FF);
+      color:#6B5BD6;box-shadow:none;gap:10px
+    }
+    .create-card:hover{background:linear-gradient(145deg,#F7F3FF,#F0EBFF);border-color:#9D8CEB}
+    .create-card .plus{
+      width:54px;height:54px;border-radius:18px;background:#EEE9FF;
+      box-shadow:0 5px 13px rgba(108,92,231,.1);font-size:29px
+    }
+    .create-card small{font-size:10px!important;color:#9990B2!important}
+    .activity-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+    .post-card{padding:17px 18px;border-radius:21px;transition:box-shadow .18s ease,border-color .18s ease}
+    .post-card:hover{border-color:#DDD5F3;box-shadow:0 13px 29px rgba(72,52,137,.085)}
+    .post-head{gap:11px;margin-bottom:13px}
+    .person{
+      width:39px;height:39px;border-radius:14px;background:linear-gradient(145deg,#FBE4F0,#EEE8FF);
+      color:#6C5CE7;box-shadow:inset 0 0 0 1px rgba(255,255,255,.85)
+    }
+    .person-meta strong{font-size:12px;color:#30265E}
+    .person-meta small{font-size:10px;color:#9991AE}
+    .post-type{background:#F2EEFF;color:#6D5BD7;font-size:10px;padding:6px 9px}
+    .post-card h3{font-size:14px;line-height:1.5;color:#2B205B;margin:0 0 7px}
+    .post-card p{font-size:12px;line-height:1.8;color:#6E6688;margin-bottom:13px}
+    .post-image{max-height:220px;border-radius:16px;border:1px solid #F0ECF8}
+    .post-actions{gap:17px;border-top:1px solid #F1EEF8;padding-top:12px}
+    .text-action{font-size:11px;color:#82799E;transition:color .15s ease}
+    .text-action:hover{color:#6C5CE7}
+    .text-action.liked{color:#E65D9A}
+    .detail-top{margin:2px 0 18px}
+    .detail-cover{
+      position:relative;overflow:hidden;padding:25px 27px;border-radius:25px;
+      border:1px solid rgba(255,255,255,.75);box-shadow:0 11px 28px rgba(70,52,133,.08)
+    }
+    .detail-cover h2{font-size:25px;color:#2B205D;line-height:1.35}
+    .detail-cover p{font-size:12px;line-height:1.7;color:#5E547D}
+    .post-list{gap:15px}
+    .empty{border:1px dashed #D8D0EF;background:rgba(255,255,255,.76);border-radius:20px;padding:38px 20px;color:#8981A3;font-size:13px;line-height:1.8}
+    .empty .empty-icon{color:#8B7BE5}
+    .modal-backdrop{background:rgba(34,23,79,.48);backdrop-filter:blur(8px)}
+    .modal{
+      width:min(560px,100%);border:1px solid rgba(255,255,255,.8);
+      border-radius:26px;padding:25px;background:#FFFEFF;
+      box-shadow:0 28px 80px rgba(33,22,79,.24)
+    }
+    .modal-head{margin-bottom:20px}
+    .modal-head h2{font-size:19px;color:#2B205D}
+    .close{background:#F1EDFF;color:#6958D7;border-radius:12px;transition:.15s}
+    .close:hover{background:#E8E1FF}
+    .field{margin:15px 0}
+    .field label{font-size:12px;color:#51476F}
+    .field input,.field textarea,.field select{
+      border:1px solid #E8E2F4;border-radius:14px;padding:12px 14px;
+      background:#fff;font-size:13px;transition:border-color .15s ease,box-shadow .15s ease
+    }
+    .field textarea{min-height:120px;line-height:1.7}
+    .field small{font-size:10px;color:#968EAA;line-height:1.6}
+    .form-actions{margin-top:22px}
+    .comment-box{border-top:1px solid #F0ECF7}
+    .comment{font-size:11px;line-height:1.7;color:#6E6688}
+    .comment-form input{border:1px solid #E8E2F4;border-radius:12px;font-size:12px}
+    .comment-form button{background:#EEE9FF;color:#6553D6;border-radius:12px}
+    .api-note{
+      color:#7B7397;background:rgba(245,242,255,.85);
+      border:1px solid #ECE6FA;border-left:3px solid #B39DFF;
+      border-radius:13px;padding:11px 14px;font-size:10px;line-height:1.7
+    }
+    footer{padding:4px 15px 28px;color:#A39BB8;font-size:10px;letter-spacing:.2px}
+
+    @media(max-width:1050px){
+      .layout{grid-template-columns:218px minmax(0,1fr);gap:20px}
+      .board-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .welcome{padding:26px 27px}
+    }
+    @media(max-width:760px){
+      .topbar{height:70px;padding:0 16px}
+      .brand-name{font-size:24px}
+      .brand-tag,.avatar-stack{display:none}
+      .layout{display:block;padding:21px 15px 38px}
+      .sidebar{position:static;display:flex;gap:8px;overflow-x:auto;margin:0 0 18px;padding-bottom:3px;scrollbar-width:none}
+      .sidebar::-webkit-scrollbar{display:none}
+      .side-card{padding:6px;display:flex;gap:4px;white-space:nowrap;margin:0;border-radius:16px;flex:0 0 auto}
+      .side-title,.side-note{display:none}
+      .nav-item{padding:10px 12px;margin:0;font-size:12px;border-radius:12px}
+      .nav-item.active,.nav-item:hover{box-shadow:none}
+      .nav-icon{width:auto;font-size:15px}
+      .welcome{min-height:175px;padding:22px 22px;border-radius:23px;margin-bottom:20px}
+      .welcome-art{width:112px;height:100px;font-size:38px;border-radius:22px}
+      .welcome-art::before{width:53px;height:53px;left:16px;top:22px;border-radius:17px}
+      h1{font-size:27px;line-height:1.3}
+      .welcome p{font-size:11px;max-width:430px}
+      .toolbar{gap:8px;margin-bottom:19px}
+      .search{min-width:180px}
+      .search input{min-height:43px}
+      .toolbar>.btn{padding:9px 13px;min-height:40px}
+      .board-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+      .board-cover{height:100px;padding:13px}
+      .board-emoji{width:50px;height:50px;border-radius:16px;font-size:27px}
+      .board-info{padding:12px}
+      .board-info h3{font-size:12px;min-height:37px}
+      .board-info p{font-size:10px;min-height:33px}
+      .create-card{min-height:205px}
+      .activity-grid{grid-template-columns:1fr;gap:12px}
+      .post-card{padding:15px}
+      .section-head{margin:23px 0 12px}
+      .section-head h2{font-size:17px}
+      .modal{padding:21px;border-radius:22px}
+    }
+    @media(max-width:430px){
+      .topbar{height:64px}
+      .brand-mark{width:41px;height:41px;border-radius:13px}
+      .brand-mark svg{width:26px;height:26px}
+      .brand-name{font-size:22px}
+      .top-actions .btn-primary{padding:9px 12px;font-size:11px}
+      .layout{padding:16px 12px 32px}
+      .welcome{padding:20px 18px;min-height:0}
+      .welcome-art{display:none}
+      h1{font-size:25px;margin-top:10px}
+      .welcome p{font-size:11px}
+      .toolbar{display:flex}
+      .search{flex:1 1 100%;min-width:0}
+      .toolbar>.btn{flex:1 1 auto;font-size:11px;padding:9px 10px}
+      .board-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+      .board-cover{height:88px;padding:10px}
+      .board-emoji{width:44px;height:44px;font-size:24px;border-radius:14px}
+      .board-tag{font-size:9px;padding:5px 7px}
+      .board-info{padding:10px}
+      .board-info h3{font-size:11px;min-height:34px}
+      .board-info p{font-size:9px;min-height:30px;margin-bottom:10px}
+      .board-meta{font-size:9px}
+      .mini-avatars span{width:20px;height:20px;font-size:9px}
+      .create-card{min-height:190px}
+      .create-card .plus{width:46px;height:46px}
+      .section-head h2{font-size:16px}
+      .section-head small{font-size:9px}
+      .detail-cover{padding:19px}
+      .detail-cover h2{font-size:21px}
+    }
+
+  
+    /* PINORA APPROVED REFERENCE DESIGN — three-column workspace */
+    :root{
+      --pinora-purple:#6C5CE7;--pinora-lavender:#B39DFF;--pinora-pink:#FF9EC7;
+      --pinora-yellow:#FFE59A;--pinora-blue:#AEE4FF;--pinora-mint:#DDF3DF;
+      --pinora-ink:#24164F;--pinora-muted:#8F87A8;--pinora-line:#ECE7F5;
+      --pinora-bg:#FBFAFF;
+    }
+    html,body{min-height:100%;margin:0}
+    body{font-family:'Kanit','Prompt','Noto Sans Thai',Tahoma,sans-serif;color:var(--pinora-ink);background:var(--pinora-bg);letter-spacing:0}
+    button,input,textarea,select{font:inherit}
+    button{cursor:pointer}
+    .app-shell{min-height:100vh;display:grid;grid-template-columns:310px minmax(0,1fr) 310px;background:#FBFAFF}
+    .left-sidebar{height:100vh;position:sticky;top:0;display:flex;flex-direction:column;padding:30px 26px 22px;background:#fff;border-right:1px solid #ECE8F4;z-index:10}
+    .brand{display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--pinora-ink);width:max-content}
+    .brand-mark{width:60px;height:60px;border-radius:19px;display:grid;place-items:center;background:linear-gradient(145deg,#FFD4E6,#D9C8FF);box-shadow:0 7px 18px rgba(108,92,231,.13);transform:rotate(-8deg)}
+    .brand-mark svg{width:43px;height:43px}
+    .brand-copy{display:flex;flex-direction:column;line-height:1.05}
+    .brand-name{font-size:32px;font-weight:800;letter-spacing:-1.2px;color:#2B1768}
+    .brand-tag{font-family:'Prompt',sans-serif;font-size:12px;color:#9B91B5;margin-top:7px}
+    .sidebar-label{font-family:'Prompt',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;color:#A69DBB;margin:48px 0 14px 12px}
+    .sidebar-nav{display:grid;gap:8px}
+    .nav-item{width:100%;display:flex;align-items:center;gap:15px;border:0;background:transparent;text-align:left;padding:15px 16px;border-radius:16px;color:#71698C;font-size:15px;font-weight:500;transition:.18s}
+    .nav-item:hover,.nav-item.active{background:#F3EFFF;color:#6248D9}
+    .nav-item.active{font-weight:700}
+    .nav-icon{width:22px;text-align:center;font-size:21px;line-height:1;color:inherit}
+    .sidebar-create{margin-top:30px;width:100%;border:0;border-radius:14px;padding:15px 14px;background:linear-gradient(110deg,#7563E9,#5C43D2);color:#fff;font-size:15px;font-weight:600;box-shadow:0 8px 17px rgba(108,92,231,.22);transition:.18s}
+    .sidebar-create:hover{transform:translateY(-2px);box-shadow:0 11px 22px rgba(108,92,231,.27)}
+    .sidebar-create span{font-size:20px;vertical-align:-1px;margin-right:6px}
+    .sidebar-bottom{margin-top:auto}
+    .sidebar-idea-note{border-radius:20px;padding:20px 19px;background:linear-gradient(140deg,#F2E9FF,#FFF0F7);color:#38276D}
+    .note-spark{display:block;font-size:22px;color:#9B80FF;margin-bottom:12px}
+    .sidebar-idea-note strong{font-size:14px;font-weight:700}
+    .sidebar-idea-note p{font-size:12px;line-height:1.75;color:#8C82A5;margin:6px 0 0}
+    .sidebar-profile{display:flex;align-items:center;gap:11px;border-top:1px solid #EEEAF5;margin-top:22px;padding:18px 4px 0}
+    .profile-avatar,.user-pill-avatar{width:42px;height:42px;display:grid;place-items:center;border-radius:50%;background:#EEE8FF;color:#7055E6;font-weight:700}
+    .sidebar-profile span:nth-child(2){display:flex;flex-direction:column;flex:1}
+    .sidebar-profile strong{font-size:12px;color:#35266B}
+    .sidebar-profile small{font-size:11px;color:#9B93B0;margin-top:3px}
+    .profile-arrow{font-size:25px;color:#A59ABF}
+    .workspace{min-width:0;min-height:100vh;display:flex;flex-direction:column}
+    .workspace-header{height:94px;flex:0 0 94px;padding:0 42px;display:flex;align-items:center;justify-content:space-between;background:#fff;border-bottom:1px solid #ECE8F4;position:sticky;top:0;z-index:8}
+    .breadcrumbs{display:flex;align-items:center;gap:14px;font-family:'Prompt',sans-serif;font-size:12px;color:#A29AB7}
+    .breadcrumbs b{font-size:17px;color:#D0C9E0;font-weight:400}
+    .breadcrumbs strong{font-size:13px;color:#49377F;font-weight:700}
+    .workspace-header-actions{display:flex;align-items:center;gap:28px}
+    .online-status{font-family:'Prompt',sans-serif;font-size:11px;color:#A29AB7;display:flex;align-items:center;gap:8px}
+    .online-status i{width:10px;height:10px;border-radius:50%;background:#61D5B1;box-shadow:0 0 0 5px #E6F9F2}
+    .user-pill{display:flex;align-items:center;gap:9px;border:1px solid #EEE9F6;border-radius:999px;background:#fff;padding:7px 14px 7px 8px;color:#62577E;font-size:12px}
+    .user-pill-avatar{width:31px;height:31px;font-size:11px}
+    .workspace-scroll{flex:1;min-width:0}
+    .workspace-main{max-width:1600px;margin:0 auto;padding:36px 50px 60px}
+    #home-view{display:block}
+    .welcome{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:28px;min-height:370px;padding:42px 48px;margin:0 0 50px;border:1px solid #E9DFFF;border-radius:27px;background:linear-gradient(112deg,#F3E9FF 0%,#F9EFFB 48%,#FFF0F3 100%);box-shadow:none}
+    .welcome:before{content:"";position:absolute;z-index:-1;width:310px;height:310px;right:-70px;bottom:-195px;border-radius:50%;background:rgba(255,255,255,.36)}
+    .welcome:after{content:"";position:absolute;z-index:-1;width:245px;height:245px;right:100px;top:-170px;border-radius:50%;border:1px solid rgba(255,255,255,.7)}
+    .welcome-copy{position:relative;z-index:2;max-width:610px}
+    .eyebrow{display:inline-flex;align-items:center;gap:10px;padding:0;background:none;border:0;box-shadow:none;border-radius:0;color:#7B61E8;font-family:'Prompt',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px}
+    .eyebrow i{width:8px;height:8px;border-radius:50%;background:#FF9EC7}
+    .welcome h1{font-size:clamp(34px,3.1vw,47px);font-weight:800;line-height:1.34;letter-spacing:-.6px;margin:20px 0 12px;color:#261455}
+    .welcome h1 span{background:linear-gradient(90deg,#6C5CE7,#8D5FE6);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .welcome p{font-family:'Prompt',sans-serif;font-size:13px;line-height:1.9;color:#8980A1;margin:0 0 20px}
+    .btn{border:0;border-radius:13px;padding:11px 17px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:9px;transition:.18s}
+    .btn-primary{background:linear-gradient(110deg,#7663E8,#6045D5);color:#fff;box-shadow:0 7px 15px rgba(108,92,231,.2)}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 19px rgba(108,92,231,.25)}
+    .hero-cta{padding:12px 18px}
+    .hero-cta span{font-size:18px;font-weight:400}
+    .btn-outline{background:#fff;border:1px solid #E5D9FF;color:#7057DC}
+    .btn-soft{background:#F1ECFF;color:#6B55D8}
+    .btn-white{background:#fff;border:1px solid #E9E3F3;color:#5F557B}
+    .hero-art{position:relative;flex:0 0 390px;height:285px;margin-right:12px;z-index:1}
+    .hero-art:before{content:"";position:absolute;width:250px;height:250px;border-radius:50%;right:-55px;bottom:-80px;background:rgba(228,205,244,.34)}
+    .paper-note{position:absolute;border-radius:17px;box-shadow:0 16px 28px rgba(89,62,139,.14);overflow:hidden}
+    .paper-yellow{width:190px;height:205px;left:34px;top:50px;background:#FFE59A;transform:rotate(-13deg)}
+    .paper-pink{width:180px;height:195px;left:160px;top:28px;background:#FFADD0;transform:rotate(9deg)}
+    .paper-blue{width:130px;height:110px;left:235px;top:157px;background:#AEE4FF;transform:rotate(-8deg)}
+    .paper-pin{position:absolute;top:18px;left:50%;width:17px;height:17px;border-radius:50%;transform:translateX(-50%);background:linear-gradient(135deg,#A78BFF,#6749C9);box-shadow:0 3px 6px #53369B44}
+    .paper-note i{position:relative;display:block;height:9px;margin-left:22px;border-radius:20px;background:rgba(122,91,153,.17)}
+    .paper-yellow i:nth-of-type(1){margin-top:66px;width:125px}
+    .paper-yellow i:nth-of-type(2){margin-top:14px;width:110px}
+    .paper-yellow i:nth-of-type(3){margin-top:14px;width:75px}
+    .paper-pink i:nth-of-type(1){margin-top:62px;width:125px}
+    .paper-pink i:nth-of-type(2){margin-top:14px;width:105px}
+    .paper-pink i:nth-of-type(3){margin-top:14px;width:75px}
+    .paper-pink b{display:block;margin:5px 0 0 22px;color:#E85E9C;font-size:29px}
+    .paper-blue i:nth-of-type(1){margin-top:48px;width:75px}
+    .paper-blue i:nth-of-type(2){margin-top:10px;width:56px}
+    .blue-star{position:absolute;right:18px;bottom:8px;color:#6C8DDB;font-size:28px}
+    .hero-spark{position:absolute;color:#F4B72F;font-size:29px;z-index:4}
+    .hero-spark-one{left:20px;top:17px}
+    .hero-spark-two{right:-18px;bottom:15px;color:#A78BFF;font-size:26px}
+    .section-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin:0 0 23px}
+    .section-kicker{display:block;font-family:'Prompt',sans-serif;font-size:10px;letter-spacing:2px;font-weight:700;color:#A59BBE;margin-bottom:7px}
+    .section-heading h2{font-size:23px;font-weight:700;line-height:1.3;margin:0;color:#29195B}
+    .section-heading p{font-family:'Prompt',sans-serif;font-size:12px;color:#9A92AD;margin:5px 0 0}
+    .heading-flower{color:#FF9EC7;font-size:22px;vertical-align:-1px;margin-left:4px}
+    .add-board-btn{font-size:12px;padding:10px 16px;border-radius:13px}
+    .add-board-btn span{font-size:18px}
+    .board-count-line{font-family:'Prompt',sans-serif;text-align:right;font-size:10px;color:#A49BB7;margin:-13px 2px 10px}
+    .toolbar{display:flex;gap:15px;align-items:center;margin:0 0 22px}
+    .search{position:relative;display:flex;align-items:center;flex:1;min-width:0;height:54px;background:#fff;border:1px solid #EAE5F3;border-radius:14px;box-shadow:none}
+    .search .search-icon{position:absolute;left:17px;top:11px;font-size:23px;color:#B0A6C5}
+    .search input{width:100%;height:100%;border:0;outline:0;background:transparent;padding:0 74px 0 52px;font-family:'Prompt',sans-serif;font-size:12px;color:#40346C;box-shadow:none}
+    .search input::placeholder{color:#B0A8C0}
+    .search button{position:absolute;right:12px;top:0;height:100%;border:0;background:transparent;color:#A29AB7;font-size:11px}
+    .category-filter{width:172px;height:54px;border:1px solid #EAE5F3;border-radius:14px;background:#fff;color:#827996;padding:0 14px;font-size:12px;outline:none}
+    .board-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+    .board-card{min-width:0;overflow:hidden;border:1px solid #ECE7F4;border-radius:22px;background:#fff;box-shadow:0 9px 25px rgba(51,36,105,.045);cursor:pointer;transition:transform .2s,box-shadow .2s}
+    .board-card:hover{transform:translateY(-4px);box-shadow:0 16px 30px rgba(51,36,105,.09)}
+    .board-cover{position:relative;isolation:isolate;overflow:hidden;height:174px;padding:15px 17px;background:var(--cover,#E4F4E5);display:flex;align-items:flex-start;justify-content:space-between}
+    .board-cover:before{content:"";position:absolute;z-index:-1;width:150px;height:150px;right:-18px;top:-67px;border:2px solid rgba(255,255,255,.7);border-radius:50%}
+    .board-cover:after{content:"";position:absolute;z-index:-1;width:90px;height:90px;left:-47px;bottom:-49px;border:1px solid rgba(255,255,255,.65);border-radius:50%}
+    .board-tag{font-family:'Prompt',sans-serif;font-size:10px;color:#766B89;background:rgba(255,255,255,.78);border:1px solid rgba(255,255,255,.6);border-radius:99px;padding:5px 10px;line-height:1.3}
+    .board-visual-icon{position:absolute;left:50%;top:50%;transform:translate(-50%,-40%);width:68px;height:68px;color:#7662D5;filter:drop-shadow(0 3px 1px rgba(78,56,147,.12))}
+    .board-visual-icon svg{width:100%;height:100%;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+    .board-info{padding:19px 20px 16px;background:#fff}
+    .board-info h3{font-size:15px;line-height:1.5;min-height:24px;margin:0 0 4px;color:#2A1A59;font-weight:700;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .board-info p{font-family:'Prompt',sans-serif;font-size:11px;line-height:1.7;color:#9A91AA;margin:0 0 15px;min-height:20px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .board-meta{display:flex;align-items:center;gap:18px;padding-top:12px;border-top:1px solid #F0EDF6;color:#9B93B0;font-family:'Prompt',sans-serif;font-size:10px}
+    .board-meta span{display:inline-flex;align-items:center;gap:5px}
+    .board-meta .meta-heart{color:#9B85E7}
+    .board-meta .card-open-arrow{margin-left:auto;font-size:19px;color:#8D75EA}
+    .create-card{min-height:350px;border:1.5px dashed #D1C5F3;background:linear-gradient(145deg,#FEFDFF,#F7F3FF);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#7059D9;font-weight:700}
+    .create-card .plus{width:55px;height:55px;border-radius:18px;background:#F0EBFF;display:grid;place-items:center;font-size:30px}
+    .create-card small{font-size:11px!important;color:#A39AB8!important}
+    .recent-section{margin-top:52px}
+    .recent-heading{margin-bottom:20px}
+    .activity-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}
+    .post-card{padding:18px 20px;border:1px solid #ECE7F4;border-radius:20px;background:#fff;box-shadow:0 8px 23px rgba(51,36,105,.04)}
+    .post-head{display:flex;align-items:center;gap:10px;margin-bottom:13px}
+    .person{width:38px;height:38px;border-radius:13px;background:linear-gradient(140deg,#FCE2EF,#EEE8FF);display:grid;place-items:center;color:#765FE0;font-size:18px}
+    .person-meta{flex:1;min-width:0}
+    .person-meta strong{display:block;font-size:12px;color:#352567}
+    .person-meta small{font-family:'Prompt',sans-serif;font-size:10px;color:#A39BB5}
+    .post-type{font-size:10px;padding:5px 9px;border-radius:99px;background:#F1EDFF;color:#715BD7}
+    .post-card h3{font-size:14px;margin:0 0 7px;color:#30205E}
+    .post-card p{font-family:'Prompt',sans-serif;font-size:12px;line-height:1.75;color:#766E8D;margin:0 0 12px;white-space:pre-wrap}
+    .post-image{width:100%;max-height:220px;object-fit:cover;border-radius:15px;margin:3px 0 12px}
+    .post-actions{display:flex;align-items:center;gap:17px;border-top:1px solid #F0EDF6;padding-top:11px}
+    .text-action{border:0;background:none;padding:3px 0;color:#8B82A2;font-size:11px;display:inline-flex;align-items:center;gap:5px}
+    .text-action.liked{color:#E65B9A;font-weight:700}
+    .detail-view{display:none}
+    .detail-top{display:flex;align-items:center;gap:10px;margin:0 0 22px}
+    .detail-cover{padding:28px;border-radius:22px;margin-bottom:28px}
+    .detail-cover h2{margin:8px 0 4px;font-size:27px}
+    .detail-cover p{margin:0;color:#655B7E;font-size:13px}
+    .post-list{display:grid;gap:15px}
+    .detail-heading{margin:24px 0}
+    .empty{padding:35px 20px;text-align:center;color:#968DAA;background:#fff;border:1px dashed #D9D1EA;border-radius:18px}
+    .empty .empty-icon{font-size:36px;margin-bottom:8px}
+    .api-note{font-family:'Prompt',sans-serif;font-size:10px;color:#948BA7;background:#F7F4FD;border:1px solid #ECE6F7;border-radius:12px;padding:11px 14px;margin-top:30px;line-height:1.7}
+    footer{text-align:center;padding:32px 10px 5px;color:#B0A8BE;font-family:'Prompt',sans-serif;font-size:10px}
+    .right-rail{height:100vh;position:sticky;top:0;overflow:auto;background:#fff;border-left:1px solid #ECE8F4;padding:52px 26px 28px}
+    .rail-eyebrow{font-family:'Prompt',sans-serif;font-size:10px;letter-spacing:2px;font-weight:700;color:#A49AB8;margin:0 0 25px 1px}
+    .rail-eyebrow span{color:#F3B73F;font-size:15px;margin-left:5px}
+    .right-welcome-card{position:relative;overflow:hidden;border-radius:23px;padding:24px 22px 22px;background:linear-gradient(145deg,#F1E8FF,#FCEFFA);min-height:340px;margin-bottom:25px}
+    .right-sparkle{width:52px;height:52px;border-radius:17px;background:rgba(255,255,255,.7);display:grid;place-items:center;color:#8B72F2;font-size:25px;margin-bottom:20px}
+    .right-welcome-card h3{font-size:23px;line-height:1.35;margin:0 0 13px;color:#29165D;font-weight:700}
+    .right-welcome-card h3 span{font-size:30px;color:#795BE2}
+    .right-welcome-card p{font-family:'Prompt',sans-serif;font-size:11px;line-height:1.9;color:#9186A8;margin:0 0 19px;max-width:210px}
+    .right-welcome-card button{border:0;background:none;padding:0;color:#7657DD;font-size:12px;font-weight:700}
+    .right-welcome-card button span{font-size:16px;margin-left:5px}
+    .welcome-ring{position:absolute;right:-38px;top:-65px;width:155px;height:155px;border:2px solid rgba(255,255,255,.72);border-radius:50%}
+    .steps-card{border:1px solid #ECE7F4;border-radius:21px;padding:21px 18px;background:#fff}
+    .steps-card h3{font-size:15px;margin:0 0 18px;color:#2E205F}
+    .step-row{display:flex;align-items:center;gap:13px;margin:14px 0}
+    .step-number{width:39px;height:39px;border-radius:14px;display:grid;place-items:center;background:#F1EAFF;color:#8068E7;font-family:'Prompt',sans-serif;font-size:12px;font-weight:700;flex:0 0 39px}
+    .step-row div{display:flex;flex-direction:column;gap:2px}
+    .step-row strong{font-size:12px;color:#392968}
+    .step-row small{font-family:'Prompt',sans-serif;font-size:10px;color:#A49BB7}
+    .rail-footer{font-family:'Prompt',sans-serif;text-align:center;font-size:10px;color:#B4ABC5;margin-top:30px}
+    .rail-footer span{color:#E9B84A;margin-right:5px}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(37,24,79,.45);backdrop-filter:blur(7px);z-index:50;display:none;align-items:center;justify-content:center;padding:16px}
+    .modal-backdrop.show{display:flex}
+    .modal{width:min(560px,100%);max-height:90vh;overflow:auto;background:#fff;border:1px solid rgba(255,255,255,.8);border-radius:25px;padding:25px;box-shadow:0 25px 75px rgba(34,22,79,.22)}
+    .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+    .modal-head h2{font-size:20px;margin:0;color:#2B1A5C}
+    .close{border:0;background:#F1EDFF;color:#725BDC;border-radius:11px;width:36px;height:36px;font-size:21px}
+    .field{margin:14px 0}
+    .field label{display:block;font-size:12px;font-weight:700;margin-bottom:7px;color:#5C5278}
+    .field input,.field textarea,.field select{width:100%;border:1px solid #E8E2F2;border-radius:13px;padding:12px 13px;outline:none;background:#fff;color:#2A1C59;font-size:13px}
+    .field textarea{min-height:110px;resize:vertical}
+    .field small{display:block;color:#9B92AD;font-size:10px;margin-top:5px}
+    .form-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}
+    .toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#28185F;color:#fff;padding:11px 17px;border-radius:13px;font-size:13px;z-index:80;transition:.25s;box-shadow:0 8px 24px rgba(32,20,79,.2)}
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    .comment-box{margin-top:12px;padding-top:12px;border-top:1px solid #F0EDF6}
+    .comment{font-size:12px;color:#706783;padding:7px 0}
+    .comment strong{color:#382866;margin-right:5px}
+    .comment-form{display:flex;gap:7px;margin-top:8px}
+    .comment-form input{flex:1;min-width:0;border:1px solid #E7E1F1;border-radius:11px;padding:9px 11px;outline:none;font-size:12px}
+    .comment-form button{border:0;border-radius:11px;padding:0 12px;background:#F0EBFF;color:#6D55D9;font-weight:700}
+    .api-note a{color:#6C5CE7}
+    @media(max-width:1500px){
+      .app-shell{grid-template-columns:270px minmax(0,1fr) 270px}
+      .left-sidebar{padding-left:22px;padding-right:22px}
+      .right-rail{padding-left:20px;padding-right:20px}
+      .workspace-main{padding-left:34px;padding-right:34px}
+      .workspace-header{padding-left:34px;padding-right:34px}
+      .hero-art{transform:scale(.9);transform-origin:center right;margin-right:0}
+      .board-grid{gap:16px}
+    }
+    @media(max-width:1200px){
+      .app-shell{grid-template-columns:260px minmax(0,1fr)}
+      .right-rail{display:none}
+      .workspace-main{padding:30px 34px 50px}
+      .welcome{min-height:330px;padding:36px}
+      .hero-art{flex-basis:340px;transform:scale(.85)}
+    }
+    @media(max-width:900px){
+      .app-shell{display:block}
+      .left-sidebar{height:auto;position:sticky;top:0;padding:12px 18px;display:flex;flex-direction:row;align-items:center;gap:20px;border-right:0;border-bottom:1px solid #ECE8F4}
+      .brand-mark{width:43px;height:43px;border-radius:14px}
+      .brand-mark svg{width:32px;height:32px}
+      .brand-name{font-size:25px}
+      .brand-tag{display:none}
+      .sidebar-label,.sidebar-bottom{display:none}
+      .sidebar-nav{display:flex;gap:4px;flex:1;min-width:0}
+      .nav-item{width:auto;padding:10px 12px;white-space:nowrap;font-size:12px;gap:7px}
+      .nav-icon{font-size:17px;width:auto}
+      .sidebar-create{width:auto;margin:0;padding:11px 13px;font-size:12px;white-space:nowrap}
+      .workspace-header{height:65px;min-height:65px;padding:0 22px}
+      .workspace-main{padding:25px 24px 45px}
+      .welcome{min-height:300px;padding:30px}
+      .welcome h1{font-size:35px}
+      .hero-art{flex-basis:280px;transform:scale(.72);margin-right:-20px}
+    }
+    @media(max-width:650px){
+      .left-sidebar{gap:12px;padding:10px 12px}
+      .brand-mark{width:38px;height:38px}
+      .brand-mark svg{width:29px;height:29px}
+      .brand-name{font-size:22px}
+      .sidebar-nav{gap:2px}
+      .nav-item{padding:9px 8px;font-size:11px;gap:5px}
+      .nav-icon{font-size:15px}
+      .sidebar-create{font-size:0;padding:9px 11px;border-radius:12px}
+      .sidebar-create span{font-size:21px;margin:0}
+      .workspace-header{padding:0 15px}
+      .workspace-header-actions{gap:12px}
+      .online-status{font-size:0}
+      .online-status i{width:9px;height:9px}
+      .user-pill{font-size:0;padding:5px}
+      .user-pill-avatar{width:30px;height:30px}
+      .breadcrumbs{font-size:10px;gap:8px}
+      .breadcrumbs strong{font-size:11px}
+      .workspace-main{padding:18px 14px 35px}
+      .welcome{min-height:310px;padding:25px 22px;margin-bottom:32px}
+      .welcome-copy{max-width:100%}
+      .welcome h1{font-size:30px;margin-top:14px}
+      .welcome p{font-size:11px;max-width:250px}
+      .desktop-break{display:none}
+      .hero-art{position:absolute;right:-30px;bottom:-48px;opacity:.7;transform:scale(.58);transform-origin:bottom right}
+      .section-heading{align-items:flex-start}
+      .section-heading h2{font-size:19px}
+      .section-heading p{font-size:10px}
+      .add-board-btn{font-size:0;padding:9px 12px}
+      .add-board-btn span{font-size:18px}
+      .toolbar{gap:8px}
+      .search{height:47px}
+      .search input{font-size:11px;padding-left:43px}
+      .search button{font-size:10px}
+      .category-filter{width:122px;height:47px;font-size:10px;padding:0 8px}
+      .board-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+      .board-cover{height:112px;padding:10px}
+      .board-visual-icon{width:49px;height:49px}
+      .board-info{padding:13px 12px}
+      .board-info h3{font-size:12px;min-height:38px}
+      .board-info p{font-size:10px;min-height:34px}
+      .board-meta{gap:8px;font-size:9px}
+      .create-card{min-height:260px}
+      .activity-grid{grid-template-columns:1fr}
+      .recent-section{margin-top:35px}
+      .right-rail{display:none}
+    }
+    @media(max-width:420px){
+      .left-sidebar{flex-wrap:wrap}
+      .brand{flex:1}
+      .sidebar-nav{order:3;flex-basis:100%;justify-content:space-between}
+      .nav-item{flex:1;justify-content:center}
+      .nav-item span:last-child{font-size:10px}
+      .welcome{min-height:290px}
+      .welcome h1{font-size:27px}
+      .board-grid{grid-template-columns:1fr}
+      .board-cover{height:135px}
+      .create-card{min-height:190px}
+      .toolbar{flex-wrap:wrap}
+      .search{flex-basis:100%}
+      .category-filter{width:100%}
+    }
+
+  
+    /* Exact Pinora brand artwork cropped from the user's approved reference */
+    .brand{display:flex;align-items:center;width:max-content;max-width:100%;gap:0}
+    .brand-logo-image{display:block;width:216px;height:82px;object-fit:contain;object-position:left center}
+    @media(max-width:1500px){.brand-logo-image{width:205px;height:auto}}
+    @media(max-width:900px){.brand-logo-image{width:175px;height:auto}}
+    @media(max-width:650px){.brand-logo-image{width:150px;height:auto}}
+
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="left-sidebar">
+    <a class="brand" href="#" onclick="showHome();return false" aria-label="Pinora หน้าหลัก">
+      <img class="brand-logo-image" src="data:image/png;base64,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" alt="Pinora — Make ideas bloom.">
+    </a>
+
+    <div class="sidebar-label">WORKSPACE</div>
+    <nav class="sidebar-nav" aria-label="เมนูหลัก">
+      <button class="nav-item active" id="nav-home" onclick="showHome()">
+        <span class="nav-icon">⌂</span><span>หน้าหลัก</span>
+      </button>
+      <button class="nav-item" id="nav-boards" onclick="showBoards()">
+        <span class="nav-icon">▦</span><span>กระดานของฉัน</span>
+      </button>
+      <button class="nav-item" id="nav-favorites" onclick="showFavorites()">
+        <span class="nav-icon">♡</span><span>โพสต์ที่ถูกใจ</span>
+      </button>
+    </nav>
+
+    <button class="sidebar-create" onclick="openBoardModal()">
+      <span>＋</span> สร้างกระดานใหม่
+    </button>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-idea-note">
+        <span class="note-spark">✳</span>
+        <strong>ทุกไอเดียมีคุณค่า</strong>
+        <p>เปลี่ยนความคิดเล็ก ๆ ให้เป็นความร่วมมือที่ยิ่งใหญ่</p>
+      </div>
+      <div class="sidebar-profile">
+        <span class="profile-avatar">ม</span>
+        <span><strong>ผู้ใช้งาน Pinora</strong><small>แก้ไขชื่อที่แสดง</small></span>
+        <span class="profile-arrow">›</span>
+      </div>
+    </div>
+  </aside>
+
+  <section class="workspace">
+    <header class="workspace-header">
+      <div class="breadcrumbs"><span>Workspace</span><b>›</b><strong id="breadcrumb-current">หน้าหลัก</strong></div>
+      <div class="workspace-header-actions">
+        <span class="online-status"><i></i> บันทึกออนไลน์</span>
+        <button class="user-pill" type="button"><span class="user-pill-avatar">ม</span> ผู้ใช้งาน Pinora</button>
+      </div>
+    </header>
+
+    <div class="workspace-scroll">
+      <main class="workspace-main">
+        <section id="home-view">
+          <section class="welcome">
+            <div class="welcome-copy">
+              <span class="eyebrow"><i></i> YOUR CREATIVE SPACE</span>
+              <h1>ไอเดียดี ๆ เริ่มต้น<br><span>จากการแบ่งปัน</span></h1>
+              <p>พื้นที่เล็ก ๆ สำหรับความคิดที่ยิ่งใหญ่ สร้างกระดาน แชร์เรื่องราว และ<br class="desktop-break"> เติบโตไปด้วยกัน</p>
+              <button class="btn btn-primary hero-cta" onclick="openBoardModal()">เริ่มสร้างกระดาน <span>→</span></button>
+            </div>
+            <div class="hero-art" aria-hidden="true">
+              <span class="hero-spark hero-spark-one">✦</span>
+              <span class="hero-spark hero-spark-two">✳</span>
+              <div class="paper-note paper-yellow"><span class="paper-pin"></span><i></i><i></i><i></i></div>
+              <div class="paper-note paper-pink"><span class="paper-pin"></span><i></i><i></i><i></i><b>♥</b></div>
+              <div class="paper-note paper-blue"><span class="paper-pin"></span><i></i><i></i><span class="blue-star">✳</span></div>
+            </div>
+          </section>
+
+          <section class="boards-section">
+            <div class="section-heading">
+              <div>
+                <span class="section-kicker">EXPLORE IDEAS</span>
+                <h2>กระดานของทุกคน <span class="heading-flower">✳</span></h2>
+                <p>พื้นที่สำหรับแบ่งปันความคิดเห็นและแรงบันดาลใจ</p>
+              </div>
+              <button class="btn btn-outline add-board-btn" onclick="openBoardModal()"><span>＋</span> สร้างกระดาน</button>
+            </div>
+
+            <div class="board-count-line"><span id="board-count">0 กระดาน</span></div>
+            <div class="toolbar">
+              <div class="search">
+                <span class="search-icon">⌕</span>
+                <input id="search-input" type="search" placeholder="ค้นหากระดานหรือหัวข้อที่สนใจ..." oninput="renderHome()">
+                <button type="button" onclick="renderHome()">ค้นหา</button>
+              </div>
+              <select id="category-filter" class="category-filter" aria-label="เลือกหมวดหมู่" onchange="setBoardFilter(this.value)">
+                <option value="ทั้งหมด">ทุกหมวดหมู่</option>
+                <option value="เรียนรู้">การเรียนรู้</option>
+                <option value="โปรเจกต์">โครงงาน</option>
+                <option value="ไอเดีย">ไอเดีย</option>
+                <option value="กิจกรรม">กิจกรรม</option>
+                <option value="ทั่วไป">ทั่วไป</option>
+              </select>
+            </div>
+
+            <div class="board-grid" id="board-grid"></div>
+          </section>
+
+          <section class="recent-section">
+            <div class="section-heading recent-heading">
+              <div>
+                <span class="section-kicker">FROM YOUR COMMUNITY</span>
+                <h2>ไอเดียล่าสุด <span class="heading-flower">✳</span></h2>
+                <p>เรื่องราวและความคิดใหม่ ๆ จากทุกกระดาน</p>
+              </div>
+              <button class="btn btn-soft" onclick="openPostModal()">＋ เพิ่มโพสต์</button>
+            </div>
+            <div class="activity-grid" id="activity-grid"></div>
+          </section>
+
+          <div class="api-note">ข้อมูลกระดาน โพสต์ ความคิดเห็น และยอดถูกใจจะซิงก์ผ่าน Supabase เมื่อเชื่อมต่อสำเร็จ</div>
+        </section>
+
+        <section id="detail-view" class="detail-view">
+          <div class="detail-top">
+            <button class="btn btn-outline" onclick="showHome()">← กลับหน้าหลัก</button>
+            <button class="btn btn-soft" onclick="shareCurrentBoard()">↗ แชร์กระดาน</button>
+          </div>
+          <div class="detail-cover" id="detail-cover"></div>
+          <div class="section-heading detail-heading">
+            <div><span class="section-kicker">BOARD DISCUSSION</span><h2>โพสต์ในกระดาน</h2></div>
+            <button class="btn btn-primary" onclick="openPostModal()">＋ เพิ่มโพสต์</button>
+          </div>
+          <div class="post-list" id="detail-posts"></div>
+        </section>
+
+        <footer>Pinora · Make ideas bloom · Share ideas, build together</footer>
+      </main>
+    </div>
+  </section>
+
+  <aside class="right-rail">
+    <div class="rail-eyebrow">HELLO, CREATOR <span>✦</span></div>
+    <section class="right-welcome-card">
+      <div class="right-sparkle">✳</div>
+      <h3>ยินดีต้อนรับสู่<br><span>Pinora!</span></h3>
+      <p>ทุกความคิดสร้างสรรค์เริ่มจากการลงมือทำ ลองสร้างกระดานแรกกันเลย</p>
+      <button onclick="openBoardModal()">สร้างกระดาน <span>→</span></button>
+      <span class="welcome-ring"></span>
+    </section>
+
+    <section class="steps-card">
+      <h3>เริ่มต้นง่าย ๆ</h3>
+      <div class="step-row"><span class="step-number">01</span><div><strong>สร้างกระดาน</strong><small>ตั้งชื่อและเลือกสีที่ชอบ</small></div></div>
+      <div class="step-row"><span class="step-number">02</span><div><strong>เพิ่มโพสต์</strong><small>พิมพ์ข้อความหรือแนบรูปภาพ</small></div></div>
+      <div class="step-row"><span class="step-number">03</span><div><strong>ชวนเพื่อนแชร์</strong><small>คิดไอเดียเพื่อร่วมกันเติบโต</small></div></div>
+    </section>
+    <div class="rail-footer"><span>✦</span> Make ideas bloom together</div>
+  </aside>
+</div>
+
+<div class="modal-backdrop" id="board-modal" onclick="backdropClose(event,'board-modal')">
+  <div class="modal">
+    <div class="modal-head"><h2>สร้างกระดานใหม่</h2><button class="close" onclick="closeModal('board-modal')">×</button></div>
+    <form id="board-form">
+      <div class="field"><label for="board-title">ชื่อกระดาน *</label><input id="board-title" maxlength="60" required placeholder="เช่น ไอเดียโปรเจกต์ใหม่"></div>
+      <div class="field"><label for="board-desc">คำอธิบาย</label><textarea id="board-desc" maxlength="180" placeholder="บอกเล่าเกี่ยวกับกระดานนี้..."></textarea></div>
+      <div class="field"><label for="board-category">หมวดหมู่</label><select id="board-category"><option>เรียนรู้</option><option>โปรเจกต์</option><option>ไอเดีย</option><option>กิจกรรม</option><option>ทั่วไป</option></select></div>
+      <div class="field"><label for="board-color">สีประจำกระดาน</label><select id="board-color"><option value="#FFE59A">เหลืองพาสเทล</option><option value="#FF9EC7">ชมพูพาสเทล</option><option value="#AEE4FF">ฟ้าพาสเทล</option><option value="#B39DFF">ม่วงพาสเทล</option><option value="#D2F2D2">เขียวพาสเทล</option></select></div>
+      <div class="form-actions"><button type="button" class="btn btn-white" onclick="closeModal('board-modal')">ยกเลิก</button><button class="btn btn-primary" type="submit">สร้างกระดาน</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="post-modal" onclick="backdropClose(event,'post-modal')">
+  <div class="modal">
+    <div class="modal-head"><h2>เพิ่มโพสต์ / แชร์ไอเดีย</h2><button class="close" onclick="closeModal('post-modal')">×</button></div>
+    <form id="post-form">
+      <div class="field"><label for="post-board">เลือกกระดาน *</label><select id="post-board" required></select></div>
+      <div class="field"><label for="post-title">หัวข้อ *</label><input id="post-title" maxlength="90" required placeholder="ตั้งชื่อไอเดียของคุณ"></div>
+      <div class="field"><label for="post-content">รายละเอียด</label><textarea id="post-content" maxlength="1500" placeholder="เขียนไอเดีย ความคิดเห็น หรือสิ่งที่อยากแบ่งปัน..."></textarea></div>
+      <div class="field"><label for="post-link">ลิงก์ (ถ้ามี)</label><input id="post-link" type="url" placeholder="https://example.com"></div>
+      <div class="field"><label for="post-file">แนบรูปภาพหรือ PDF (ไม่เกิน 1 MB)</label><input id="post-file" type="file" accept="image/*,.pdf"><small>ไฟล์รูปภาพและ PDF จะถูกจัดเก็บไว้ในพื้นที่ไฟล์ของ Pinora</small></div>
+      <div class="form-actions"><button type="button" class="btn btn-white" onclick="closeModal('post-modal')">ยกเลิก</button><button class="btn btn-primary" type="submit">เผยแพร่โพสต์</button></div>
+    </form>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(() => {
+  // Supabase connection (Publishable Key is intended for browser-side use).
+  const SUPABASE_URL = "https://wreufcjtwewliovjknxr.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_GIL28vIXt22mSrD3alMEoA_n32149Jf";
+  const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+  const STORE_KEY = "pinora_v1_data";
+  const LIKED_KEY = "pinora_v1_liked_posts";
+  const VISITOR_KEY = "pinora_v1_visitor_id";
+  const icons = ["💡","🧪","🎨","🚀","📚","🧩","🌱","🎯"];
+  let filter = "ทั้งหมด";
+  let activeBoardId = null;
+  let favoritesOnly = false;
+  let cloudReady = false;
+  let realtimeChannel = null;
+  let refreshTimer = null;
+
+  const uid = () => "p" + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+  const escapeHTML = (s="") => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const safeLink = value => {
+    try { const u = new URL(value); return ["http:","https:"].includes(u.protocol) ? u.href : ""; }
+    catch { return ""; }
+  };
+  const visitorId = (() => {
+    let id = localStorage.getItem(VISITOR_KEY);
+    if (!id) { id = uid() + uid(); localStorage.setItem(VISITOR_KEY, id); }
+    return id;
+  })();
+  const getLikedIds = () => {
+    try { return new Set(JSON.parse(localStorage.getItem(LIKED_KEY) || "[]")); }
+    catch { return new Set(); }
+  };
+  const setLikedIds = ids => localStorage.setItem(LIKED_KEY, JSON.stringify([...ids]));
+
+  const seed = {
+    boards:[
+      {id:"b1",title:"ไอเดียกิจกรรมในสัปดาห์วิทยาศาสตร์",description:"รวบรวมไอเดียและกิจกรรมสนุก ๆ สำหรับทุกคน",category:"กิจกรรม",color:"#FFE59A",icon:"🧪",created:Date.now()-800000},
+      {id:"b2",title:"Workshop กำลังประดิษฐ์",description:"พื้นที่แบ่งปันความรู้และลงมือสร้างสรรค์",category:"เรียนรู้",color:"#FF9EC7",icon:"🛠️",created:Date.now()-700000},
+      {id:"b3",title:"ประกวดไอเดียนวัตกรรม",description:"เสนอแนวคิดใหม่ ๆ ที่อยากให้เกิดขึ้นจริง",category:"โปรเจกต์",color:"#AEE4FF",icon:"🏆",created:Date.now()-600000},
+      {id:"b4",title:"ทดลองวิทยาศาสตร์",description:"เก็บการทดลองและผลลัพธ์ไว้ในที่เดียว",category:"เรียนรู้",color:"#D2F2D2",icon:"⚗️",created:Date.now()-500000}
+    ],
+    posts:[
+      {id:"p1",boardId:"b1",title:"กิจกรรมเปิดบ้านวิทยาศาสตร์",content:"ชวนทุกคนมาแชร์ไอเดียฐานกิจกรรมที่ทั้งสนุกและได้ความรู้",author:"Pinora Team",created:Date.now()-3600000,likes:12,liked:false,comments:[{author:"Mina",text:"น่าสนใจมากค่ะ"}],file:null,link:""},
+      {id:"p2",boardId:"b2",title:"Workshop งานประดิษฐ์",content:"มาลองออกแบบกิจกรรมที่ให้ทุกคนได้ลงมือทำจริงกัน",author:"Nina",created:Date.now()-7200000,likes:18,liked:false,comments:[],file:null,link:""},
+      {id:"p3",boardId:"b3",title:"ไอเดียจรวดพลังงานสะอาด",content:"ทดลองสร้างต้นแบบจรวดจำลองและเรียนรู้หลักการแรงขับ",author:"Korn",created:Date.now()-10800000,likes:21,liked:false,comments:[{author:"Mew",text:"อยากเห็นต้นแบบเลย"}],file:null,link:""},
+      {id:"p4",boardId:"b4",title:"ทดลองสีจากธรรมชาติ",content:"ใช้ดอกไม้และพืชใกล้ตัวมาทดลองสกัดสี",author:"Mina",created:Date.now()-14400000,likes:15,liked:false,comments:[],file:null,link:""}
+    ]
+  };
+
+  let data;
+  try { data = JSON.parse(localStorage.getItem(STORE_KEY)) || seed; }
+  catch(e){ data = seed; }
+
+  function saveLocal(){
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
+    catch(e){ toast("พื้นที่จัดเก็บในเบราว์เซอร์เต็ม"); }
+  }
+  function toast(message){
+    const el=document.getElementById("toast");
+    el.textContent=message;
+    el.classList.add("show");
+    clearTimeout(toast.timer);
+    toast.timer=setTimeout(()=>el.classList.remove("show"),3200);
+  }
+  function openModal(id){document.getElementById(id).classList.add("show");}
+  window.closeModal = id => document.getElementById(id).classList.remove("show");
+  window.backdropClose = (e,id) => {if(e.target.id===id)closeModal(id);};
+  window.openBoardModal = () => openModal("board-modal");
+  window.openPostModal = () => {
+    populateBoardSelect();
+    if(!data.boards.length){toast("กรุณาสร้างกระดานก่อน");return;}
+    openModal("post-modal");
+  };
+  window.focusSearch = () => {showHome();document.getElementById("search-input").focus();};
+  window.setBoardFilter = value => {filter=value;renderHome();};
+  window.showHome = () => {
+    activeBoardId=null;favoritesOnly=false;filter="ทั้งหมด";
+    document.getElementById("home-view").style.display="block";
+    document.getElementById("detail-view").style.display="none";
+    document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+    document.getElementById("nav-home").classList.add("active");
+    document.getElementById("breadcrumb-current").textContent="หน้าหลัก";
+    renderHome();
+  };
+  window.showBoards = () => {
+    showHome();
+    document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+    document.getElementById("nav-boards").classList.add("active");
+    document.getElementById("breadcrumb-current").textContent="กระดานของฉัน";
+  };
+  window.showFavorites = () => {
+    activeBoardId=null;favoritesOnly=true;
+    document.getElementById("home-view").style.display="block";
+    document.getElementById("detail-view").style.display="none";
+    document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+    document.getElementById("nav-favorites").classList.add("active");
+    document.getElementById("breadcrumb-current").textContent="โพสต์ที่ถูกใจ";
+    renderHome();
+  };
+
+  function boardArt(category){
+    const cat=String(category||"").toLowerCase();
+    if(cat.includes("เรียน") || cat.includes("learn")){
+      return `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M18 8h21l10 10v38H18z"/><path d="M39 8v11h10M25 31h17M25 39h17M25 47h12"/></svg>`;
+    }
+    if(cat.includes("โครง") || cat.includes("โปรเจกต์") || cat.includes("project")){
+      return `<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="9" y="13" width="46" height="38" rx="5"/><circle cx="23" cy="25" r="4"/><path d="m13 45 13-12 9 8 7-7 9 10"/></svg>`;
+    }
+    if(cat.includes("ไอเดีย") || cat.includes("idea")){
+      return `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="m17 39 8-8 18-18 10 10-18 18-8 8z"/><path d="m37 17 10 10M15 43l7 7M12 55l12-12M43 9l4 4"/></svg>`;
+    }
+    if(cat.includes("กิจกรรม") || cat.includes("วิทย์")){
+      return `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M25 8h14M29 8v17L15 49a6 6 0 0 0 5 9h24a6 6 0 0 0 5-9L35 25V8"/><path d="M21 43h22M25 36h14"/></svg>`;
+    }
+    return `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M10 16h44v34H10z"/><path d="M18 25h28M18 33h20M18 41h24"/></svg>`;
+  }
+  function boardTone(category,color){
+    const cat=String(category||"").toLowerCase();
+    if(cat.includes("เรียน"))return "#DDF3DF";
+    if(cat.includes("โครง")||cat.includes("โปรเจกต์"))return "#D9F1FF";
+    if(cat.includes("ไอเดีย"))return "#FFD8E9";
+    if(cat.includes("กิจกรรม")||cat.includes("วิทย์"))return "#FFE9A8";
+    if(cat.includes("ทั่วไป"))return "#EEE7FF";
+    return color||"#EDE7FF";
+  }
+  function renderHome(){
+    const query=(document.getElementById("search-input")?.value||"").trim().toLowerCase();
+    let boards=data.boards.filter(b=>(filter==="ทั้งหมด"||b.category===filter)&&(!query||(b.title+" "+b.description).toLowerCase().includes(query)));
+    if(favoritesOnly) boards=[];
+    document.getElementById("board-count").textContent=`${boards.length} กระดาน`;
+    const grid=document.getElementById("board-grid");
+    grid.innerHTML=boards.map(b=>{
+      const postCount=data.posts.filter(p=>p.boardId===b.id).length;
+      const likeCount=data.posts.filter(p=>p.boardId===b.id).reduce((n,p)=>n+(Number(p.likes)||0),0);
+      const categoryLabel=({"เรียนรู้":"การเรียนรู้","โปรเจกต์":"โครงงาน","ไอเดีย":"ไอเดีย","กิจกรรม":"กิจกรรม"}[b.category]||b.category||"ทั่วไป");
+      return `<article class="board-card" onclick="openBoard('${escapeHTML(b.id)}')">
+        <div class="board-cover" style="--cover:${escapeHTML(boardTone(b.category,b.color))}">
+          <span class="board-tag">${escapeHTML(categoryLabel)}</span>
+          <span class="board-visual-icon">${boardArt(b.category)}</span>
+        </div>
+        <div class="board-info">
+          <h3>${escapeHTML(b.title)}</h3>
+          <p>${escapeHTML(b.description||"พื้นที่สำหรับแบ่งปันความคิดเห็นและแรงบันดาลใจ")}</p>
+          <div class="board-meta">
+            <span>▦ ${postCount} โพสต์</span>
+            <span class="meta-heart">♡ ${likeCount}</span>
+            <span class="card-open-arrow">↗</span>
+          </div>
+        </div>
+      </article>`;
+    }).join("");
+    grid.insertAdjacentHTML("beforeend",`<article class="board-card create-card" onclick="openBoardModal()"><span class="plus">＋</span><span>สร้างกระดานใหม่</span><small>เริ่มต้นพื้นที่ไอเดียของคุณ</small></article>`);
+    let posts=[...data.posts].sort((a,b)=>b.created-a.created);
+    if(favoritesOnly)posts=posts.filter(p=>p.liked);
+    if(query)posts=posts.filter(p=>(p.title+" "+p.content).toLowerCase().includes(query));
+    document.getElementById("activity-grid").innerHTML=posts.slice(0,6).map(renderPost).join("")||`<div class="empty" style="grid-column:1/-1"><div class="empty-icon">♡</div>ยังไม่มีโพสต์ที่ตรงกับการค้นหา</div>`;
+    const categorySelect=document.getElementById("category-filter");
+    if(categorySelect && categorySelect.value!==filter) categorySelect.value=filter;
+  }
+
+  function renderPost(p){
+    const board=data.boards.find(b=>b.id===p.boardId);
+    const attachment=p.file?(p.file.type?.startsWith("image/")?`<img class="post-image" src="${escapeHTML(p.file.data)}" alt="ไฟล์แนบ">`:`<div class="api-note">📎 <a href="${escapeHTML(p.file.data)}" target="_blank" rel="noopener noreferrer">${escapeHTML(p.file.name)}</a></div>`):"";
+    const validLink=safeLink(p.link||"");
+    const link=validLink?`<p><a href="${escapeHTML(validLink)}" target="_blank" rel="noopener noreferrer" style="color:#6C5CE7">${escapeHTML(validLink)}</a></p>`:"";
+    return `<article class="post-card" id="post-${escapeHTML(p.id)}">
+      <div class="post-head"><div class="person">✦</div><div class="person-meta"><strong>${escapeHTML(p.author||"ผู้ใช้งาน")}</strong><small>${escapeHTML(board?.title||"กระดาน")} • ${timeAgo(p.created)}</small></div><span class="post-type">${escapeHTML(board?.category||"ไอเดีย")}</span></div>
+      <h3>${escapeHTML(p.title)}</h3><p>${escapeHTML(p.content||"")}</p>${attachment}${link}
+      <div class="post-actions"><button class="text-action ${p.liked?"liked":""}" onclick="toggleLike('${escapeHTML(p.id)}')">${p.liked?"♥":"♡"} ${p.likes||0} ถูกใจ</button><button class="text-action" onclick="toggleComments('${escapeHTML(p.id)}')">▢ ${(p.comments||[]).length} ความคิดเห็น</button></div>
+      <div class="comment-box" id="comments-${escapeHTML(p.id)}" style="display:none">${(p.comments||[]).map(c=>`<div class="comment"><strong>${escapeHTML(c.author)}:</strong>${escapeHTML(c.text)}</div>`).join("")}
+        <form class="comment-form" onsubmit="addComment(event,'${escapeHTML(p.id)}')"><input id="comment-input-${escapeHTML(p.id)}" maxlength="250" placeholder="เขียนความคิดเห็น..." required><button type="submit">ส่ง</button></form>
+      </div></article>`;
+  }
+  function timeAgo(t){
+    const mins=Math.max(1,Math.floor((Date.now()-Number(t))/60000));
+    if(mins<60)return `${mins} นาทีที่แล้ว`;
+    const h=Math.floor(mins/60);
+    if(h<24)return `${h} ชั่วโมงที่แล้ว`;
+    return `${Math.floor(h/24)} วันที่แล้ว`;
+  }
+
+  window.openBoard = id => {
+    const b=data.boards.find(x=>x.id===id);if(!b)return;
+    activeBoardId=id;
+    document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+    document.getElementById("nav-boards").classList.add("active");
+    document.getElementById("breadcrumb-current").textContent=b.title;
+    document.getElementById("home-view").style.display="none";
+    document.getElementById("detail-view").style.display="block";
+    document.getElementById("detail-cover").style.background=b.color;
+    document.getElementById("detail-cover").innerHTML=`<div style="font-size:38px">${escapeHTML(b.icon||"📌")}</div><span class="board-tag">${escapeHTML(b.category)}</span><h2>${escapeHTML(b.title)}</h2><p>${escapeHTML(b.description||"")}</p>`;
+    renderDetail();
+    history.replaceState(null,"",`#board=${encodeURIComponent(id)}`);
+  };
+  function renderDetail(){
+    const posts=data.posts.filter(p=>p.boardId===activeBoardId).sort((a,b)=>b.created-a.created);
+    document.getElementById("detail-posts").innerHTML=posts.map(renderPost).join("")||`<div class="empty"><div class="empty-icon">💡</div>ยังไม่มีโพสต์ในกระดานนี้<br>เริ่มแชร์ไอเดียแรกของคุณได้เลย</div>`;
+  }
+  function refreshVisible(){if(activeBoardId)renderDetail();else renderHome();}
+  window.toggleLike = async id => {
+    const p=data.posts.find(x=>x.id===id);if(!p)return;
+    if(cloudReady){
+      const {data:count,error}=await supabaseClient.rpc("toggle_post_like",{p_post_id:id,p_visitor_id:visitorId});
+      if(error){console.error(error);toast("กดถูกใจไม่สำเร็จ");return;}
+      const liked=getLikedIds();liked.has(id)?liked.delete(id):liked.add(id);setLikedIds(liked);
+      if(typeof count==="number")p.likes=count;
+      p.liked=liked.has(id);saveLocal();refreshVisible();
+      return;
+    }
+    p.liked=!p.liked;p.likes=Math.max(0,(p.likes||0)+(p.liked?1:-1));saveLocal();refreshVisible();
+  };
+  window.toggleComments = id => {const el=document.getElementById("comments-"+id);if(el)el.style.display=el.style.display==="none"?"block":"none";};
+  window.addComment = async (e,id) => {
+    e.preventDefault();
+    const input=document.getElementById("comment-input-"+id);
+    const text=input.value.trim();if(!text)return;
+    if(cloudReady){
+      const {error}=await supabaseClient.from("comments").insert({id:uid(),post_id:id,author:"ผู้ใช้งาน",body:text});
+      if(error){console.error(error);toast("บันทึกความคิดเห็นไม่สำเร็จ");return;}
+      await loadCloudData(false);refreshVisible();
+      const box=document.getElementById("comments-"+id);if(box)box.style.display="block";
+      toast("บันทึกความคิดเห็นแล้ว");
+      return;
+    }
+    const p=data.posts.find(x=>x.id===id);if(!p)return;
+    p.comments=p.comments||[];p.comments.push({author:"คุณ",text});saveLocal();refreshVisible();
+    const box=document.getElementById("comments-"+id);if(box)box.style.display="block";
+  };
+
+  function populateBoardSelect(){
+    const sel=document.getElementById("post-board");
+    sel.innerHTML=data.boards.map(b=>`<option value="${escapeHTML(b.id)}">${escapeHTML(b.title)}</option>`).join("");
+    if(activeBoardId)sel.value=activeBoardId;
+  }
+  window.shareCurrentBoard = async () => {
+    const b=data.boards.find(x=>x.id===activeBoardId);if(!b)return;
+    const url=location.href;
+    try{await navigator.clipboard.writeText(url);toast("คัดลอกลิงก์แล้ว");}
+    catch(e){toast("คัดลอก URL จากแถบที่อยู่ได้เลย");}
+  };
+
+  async function uploadAttachment(file){
+    const safeName=file.name.normalize("NFKD").replace(/[^a-zA-Z0-9._-]/g,"_").slice(-90)||"attachment";
+    const filePath=`${visitorId}/${Date.now()}-${safeName}`;
+    const {error}=await supabaseClient.storage.from("pinora-uploads").upload(filePath,file,{cacheControl:"3600",upsert:false,contentType:file.type});
+    if(error)throw error;
+    const {data}=supabaseClient.storage.from("pinora-uploads").getPublicUrl(filePath);
+    return data.publicUrl;
+  }
+  function readFile(file){
+    return new Promise((resolve,reject)=>{
+      const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file);
+    });
+  }
+
+  document.getElementById("board-form").addEventListener("submit",async e=>{
+    e.preventDefault();
+    const title=document.getElementById("board-title").value.trim();if(!title)return;
+    const board={id:uid(),title,description:document.getElementById("board-desc").value.trim(),category:document.getElementById("board-category").value,color:document.getElementById("board-color").value,icon:icons[Math.floor(Math.random()*icons.length)],created:Date.now()};
+    if(cloudReady){
+      const {error}=await supabaseClient.from("boards").insert({id:board.id,title:board.title,description:board.description,category:board.category,color:board.color,icon:board.icon});
+      if(error){console.error(error);toast("สร้างกระดานไม่สำเร็จ");return;}
+      await loadCloudData(false);
+    }else{
+      data.boards.unshift(board);saveLocal();
+    }
+    e.target.reset();closeModal("board-modal");filter="ทั้งหมด";renderHome();toast("สร้างกระดานเรียบร้อยแล้ว");
+  });
+
+  document.getElementById("post-form").addEventListener("submit",async e=>{
+    e.preventDefault();
+    const title=document.getElementById("post-title").value.trim();
+    const boardId=document.getElementById("post-board").value;
+    if(!title||!boardId)return;
+    const fileInput=document.getElementById("post-file");
+    const selected=fileInput.files[0];
+    if(selected){
+      if(selected.size>1024*1024){toast("ไฟล์ต้องมีขนาดไม่เกิน 1 MB");return;}
+      if(!(selected.type.startsWith("image/")||selected.type==="application/pdf")){toast("รองรับเฉพาะรูปภาพและ PDF");return;}
+    }
+    const postId=uid();
+    const link=safeLink(document.getElementById("post-link").value.trim());
+    if(cloudReady){
+      let fileUrl=null;
+      try{
+        if(selected)fileUrl=await uploadAttachment(selected);
+        const {error}=await supabaseClient.from("posts").insert({
+          id:postId,board_id:boardId,title,
+          content:document.getElementById("post-content").value.trim(),
+          author:"ผู้ใช้งาน",link,
+          file_url:fileUrl,file_name:selected?.name||null,file_type:selected?.type||null
+        });
+        if(error)throw error;
+        await loadCloudData(false);
+      }catch(error){console.error(error);toast("บันทึกโพสต์หรือไฟล์แนบไม่สำเร็จ");return;}
+    }else{
+      let file=null;
+      if(selected)file={name:selected.name,type:selected.type,data:await readFile(selected)};
+      data.posts.unshift({id:postId,boardId,title,content:document.getElementById("post-content").value.trim(),author:"คุณ",created:Date.now(),likes:0,liked:false,comments:[],file,link});
+      saveLocal();
+    }
+    e.target.reset();closeModal("post-modal");
+    if(activeBoardId===boardId)renderDetail();else renderHome();
+    toast("เผยแพร่โพสต์เรียบร้อยแล้ว");
+  });
+
+  async function migrateLocalData(){
+    if(data.boards.length){
+      const rows=data.boards.map(b=>({id:b.id,title:b.title,description:b.description||"",category:b.category||"ทั่วไป",color:b.color||"#B39DFF",icon:b.icon||"📌",created_at:new Date(b.created||Date.now()).toISOString()}));
+      const {error}=await supabaseClient.from("boards").upsert(rows,{onConflict:"id"});
+      if(error)throw error;
+    }
+    for(const p of data.posts){
+      let fileUrl=null;
+      if(p.file?.data?.startsWith("data:")){
+        try{
+          const blob=await (await fetch(p.file.data)).blob();
+          const file=new File([blob],p.file.name||"attachment",{type:p.file.type||blob.type});
+          fileUrl=await uploadAttachment(file);
+        }catch(err){console.warn("Skipped local attachment migration",err);}
+      }
+      const {error}=await supabaseClient.from("posts").upsert({
+        id:p.id,board_id:p.boardId,title:p.title,content:p.content||"",author:p.author||"ผู้ใช้งาน",
+        created_at:new Date(p.created||Date.now()).toISOString(),likes:p.likes||0,link:safeLink(p.link||""),
+        file_url:fileUrl,file_name:p.file?.name||null,file_type:p.file?.type||null
+      },{onConflict:"id"});
+      if(error)throw error;
+      if(p.comments?.length){
+        const commentRows=p.comments.map(c=>({id:uid(),post_id:p.id,author:c.author||"ผู้ใช้งาน",body:c.text||""}));
+        const {error:commentError}=await supabaseClient.from("comments").insert(commentRows);
+        if(commentError)throw commentError;
+      }
+    }
+  }
+
+  async function loadCloudData(allowMigration=false){
+    if(!supabaseClient)throw new Error("Supabase client library unavailable");
+    const [bRes,pRes,cRes]=await Promise.all([
+      supabaseClient.from("boards").select("*").order("created_at",{ascending:false}),
+      supabaseClient.from("posts").select("*").order("created_at",{ascending:false}),
+      supabaseClient.from("comments").select("*").order("created_at",{ascending:true})
+    ]);
+    if(bRes.error)throw bRes.error;
+    if(pRes.error)throw pRes.error;
+    if(cRes.error)throw cRes.error;
+
+    if(allowMigration && bRes.data.length===0 && data.boards.length){
+      await migrateLocalData();
+      return loadCloudData(false);
+    }
+
+    const commentsByPost={};
+    for(const c of cRes.data){
+      (commentsByPost[c.post_id] ||= []).push({author:c.author,text:c.body});
+    }
+    const liked=getLikedIds();
+    data={
+      boards:bRes.data.map(b=>({id:b.id,title:b.title,description:b.description||"",category:b.category||"ทั่วไป",color:b.color||"#B39DFF",icon:b.icon||"📌",created:Date.parse(b.created_at)||Date.now()})),
+      posts:pRes.data.map(p=>({
+        id:p.id,boardId:p.board_id,title:p.title,content:p.content||"",author:p.author||"ผู้ใช้งาน",
+        created:Date.parse(p.created_at)||Date.now(),likes:p.likes||0,liked:liked.has(p.id),
+        comments:commentsByPost[p.id]||[],
+        file:p.file_url?{name:p.file_name||"ไฟล์แนบ",type:p.file_type||"",data:p.file_url}:null,
+        link:p.link||""
+      }))
+    };
+    saveLocal();
+    return true;
+  }
+
+  function subscribeRealtime(){
+    if(!supabaseClient||realtimeChannel)return;
+    realtimeChannel=supabaseClient.channel("pinora-live-updates")
+      .on("postgres_changes",{event:"*",schema:"public",table:"boards"},scheduleCloudRefresh)
+      .on("postgres_changes",{event:"*",schema:"public",table:"posts"},scheduleCloudRefresh)
+      .on("postgres_changes",{event:"*",schema:"public",table:"comments"},scheduleCloudRefresh)
+      .subscribe();
+  }
+  function scheduleCloudRefresh(){
+    clearTimeout(refreshTimer);
+    refreshTimer=setTimeout(async()=>{
+      try{await loadCloudData(false);refreshVisible();}
+      catch(error){console.error("Realtime refresh failed",error);}
+    },350);
+  }
+
+  async function initCloud(){
+    if(!supabaseClient){toast("โหลด Supabase ไม่สำเร็จ กำลังใช้ข้อมูลในเครื่อง");renderHome();return;}
+    try{
+      await loadCloudData(true);
+      cloudReady=true;
+      subscribeRealtime();
+      renderHome();
+      if(activeBoardId)openBoard(activeBoardId);
+      toast("เชื่อมต่อฐานข้อมูล Pinora แล้ว");
+    }catch(error){
+      cloudReady=false;
+      console.error("Supabase connection/setup error:",error);
+      renderHome();
+      toast("ฐานข้อมูลยังไม่พร้อม กรุณารันไฟล์ SQL ที่แนบมาก่อน");
+    }
+  }
+
+  function handleHash(){
+    const match=location.hash.match(/board=([^&]+)/);
+    if(match){
+      const id=decodeURIComponent(match[1]);
+      if(data.boards.some(b=>b.id===id)){window.openBoard(id);return;}
+    }
+    if(!activeBoardId)showHome();
+  }
+  window.addEventListener("hashchange",handleHash);
+  renderHome();
+  handleHash();
+  initCloud();
+})();
+</script>
+</body>
+</html>
